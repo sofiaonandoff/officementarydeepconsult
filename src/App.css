@@ -1,0 +1,120 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: auto;
+  padding: 1em 1em;
+  will-change: filter;
+  transition: filter 300ms;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #4a90e2;
+  white-space: nowrap;
+}
+
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  width: 100%;
+  max-width: 1200px;
+  min-width: 800px;
+  margin: 0 auto;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0.25rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #4a90e2;
+  white-space: nowrap;
+}
+
+.service-intro {
+  color: #666;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-left: 2px solid #e0e0e0;
+  padding-left: 2rem;
+}
+
+main {
+  flex: 1;
+  background-color: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+
+  .service-intro {
+    border-left: none;
+    padding-left: 0;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .app-header {
+    max-width: 100%;
+    padding: 0.5rem 0.5rem;
+  }
+}
