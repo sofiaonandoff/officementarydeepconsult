@@ -1,9 +1,9 @@
 {
-  "name": "officementaryservice",
+  "name": "officementarydeepconsult",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://sofiaonandoff.github.io/officementaryservice",
+  "homepage": "https://sofiaonandoff.github.io/officementarydeepconsult",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
