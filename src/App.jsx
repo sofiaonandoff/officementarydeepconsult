@@ -19,13 +19,13 @@ function RedirectHandler() {
 
 function App() {
   return (
-    <Router basename="/officementaryservice">
+    <Router basename="/officementarydeepconsult">
       <div className="App">
         <RedirectHandler />
         <header className="app-header">
           <div className="header-content">
             <div className="logo">
-              <img src="/officementaryservice/officementary_logo.png" alt="officementary" style={{ height: '1em', display: 'block' }} />
+              <img src="/officementarydeepconsult/officementary_logo.png" alt="officementary" style={{ height: '1em', display: 'block' }} />
             </div>
             <div className="service-intro">다음 정보를 입력해주시면 더 빠르고 정확한 상담을 받으실 수 있습니다.</div>
           </div>
