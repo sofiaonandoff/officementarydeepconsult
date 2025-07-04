@@ -33,6 +33,17 @@ const InitialInfo = () => {
   const [canteenOther, setCanteenOther] = useState('');
   const [meetingOptions, setMeetingOptions] = useState([]);
   const [meetingOther, setMeetingOther] = useState('');
+  // 추가 공간 상태
+  const [extraSpaces, setExtraSpaces] = useState([]);
+  const [extraDetail, setExtraDetail] = useState({
+    reception: { count: '' },
+    lounge: { seat: '', purpose: [] },
+    breakRoom: { facilities: [], etc: '' },
+    storage: { racks: [{ size: '', count: '' }], add: [] },
+    exhibition: { purpose: [], etc: '' },
+    serverRoom: { rack: false, aircon: false, etcChecked: false, etc: '' },
+    other: { desc: '' }
+  });
 
   // 초기 formData 상태
   const initialFormData = {
@@ -919,7 +930,7 @@ const InitialInfo = () => {
             <div className="space-requirements">
               <div className="requirement-section">
                 <h3>캔틴 구성</h3>
-                <div className="canteen-options" style={{ marginBottom: 16 }}>
+                <div className="canteen-options" style={{ marginBottom: 16, display: 'flex', flexWrap: 'nowrap', justifyContent: 'flex-start' }}>
                   {[
                     { id: 'water', label: '정수기' },
                     { id: 'microwave', label: '전자레인지' },
@@ -929,7 +940,7 @@ const InitialInfo = () => {
                   ].map(opt => {
                     const checked = canteenOptions.includes(opt.id);
                     return (
-                      <span key={opt.id} style={{ display: 'inline-block', marginRight: 8 }}>
+                      <span key={opt.id} style={{ display: 'inline-block' }}>
                         <button
                           type="button"
                           className={`work-style-checkbox work-style-btn${checked ? ' selected' : ''}`}
@@ -987,7 +998,7 @@ const InitialInfo = () => {
                   ].map(opt => {
                     const checked = meetingOptions.includes(opt.id);
                     return (
-                      <span key={opt.id} style={{ display: 'inline-block', marginRight: 8 }}>
+                      <span key={opt.id} style={{ display: 'inline-block' }}>
                         <button
                           type="button"
                           className={`work-style-checkbox work-style-btn${checked ? ' selected' : ''}`}
@@ -1033,134 +1044,242 @@ const InitialInfo = () => {
               </div>
 
               <div className="requirement-section">
-                <h3>추가 공간</h3>
+                <h3>추가 공간 구성</h3>
                 <div className="additional-spaces">
-                  <div className="space-option">
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={formData.additionalSpaces.canteen.required}
-                        onChange={() => handleAdditionalSpaceToggle('canteen')}
-                      />
-                      캔틴
-                    </label>
-                    {formData.additionalSpaces.canteen.required && (
-                      <input
-                        type="text"
-                        placeholder="캔틴 크기 (예: 5x5m)"
-                        value={formData.additionalSpaces.canteen.size}
-                        onChange={(e) => handleAdditionalSpaceSizeChange('canteen', e.target.value)}
-                      />
-                    )}
-                  </div>
-                  <div className="space-option">
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={formData.additionalSpaces.lounge.required}
-                        onChange={() => handleAdditionalSpaceToggle('lounge')}
-                      />
-                      라운지
-                    </label>
-                    {formData.additionalSpaces.lounge.required && (
-                      <input
-                        type="text"
-                        placeholder="라운지 크기 (예: 4x4m)"
-                        value={formData.additionalSpaces.lounge.size}
-                        onChange={(e) => handleAdditionalSpaceSizeChange('lounge', e.target.value)}
-                      />
-                    )}
-                  </div>
-                  <div className="space-option">
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={formData.additionalSpaces.breakRoom.required}
-                        onChange={() => handleAdditionalSpaceToggle('breakRoom')}
-                      />
-                      휴게실
-                    </label>
-                    {formData.additionalSpaces.breakRoom.required && (
-                      <input
-                        type="text"
-                        placeholder="휴게실 크기 (예: 4x4m)"
-                        value={formData.additionalSpaces.breakRoom.size}
-                        onChange={(e) => handleAdditionalSpaceSizeChange('breakRoom', e.target.value)}
-                      />
-                    )}
-                  </div>
-                  <div className="space-option">
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={formData.additionalSpaces.storage.required}
-                        onChange={() => handleAdditionalSpaceToggle('storage')}
-                      />
-                      창고
-                    </label>
-                    {formData.additionalSpaces.storage.required && (
-                      <input
-                        type="text"
-                        placeholder="창고 크기 (예: 3x3m)"
-                        value={formData.additionalSpaces.storage.size}
-                        onChange={(e) => handleAdditionalSpaceSizeChange('storage', e.target.value)}
-                      />
-                    )}
-                  </div>
-                  <div className="space-option">
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={formData.additionalSpaces.exhibition.required}
-                        onChange={() => handleAdditionalSpaceToggle('exhibition')}
-                      />
-                      전시공간
-                    </label>
-                    {formData.additionalSpaces.exhibition.required && (
-                      <input
-                        type="text"
-                        placeholder="전시공간 크기 (예: 6x6m)"
-                        value={formData.additionalSpaces.exhibition.size}
-                        onChange={(e) => handleAdditionalSpaceSizeChange('exhibition', e.target.value)}
-                      />
-                    )}
-                  </div>
-                  <div className="space-option">
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={formData.additionalSpaces.serverRoom.required}
-                        onChange={() => handleAdditionalSpaceToggle('serverRoom')}
-                      />
-                      서버실
-                    </label>
-                    {formData.additionalSpaces.serverRoom.required && (
-                      <input
-                        type="text"
-                        placeholder="서버실 크기 (예: 4x4m)"
-                        value={formData.additionalSpaces.serverRoom.size}
-                        onChange={(e) => handleAdditionalSpaceSizeChange('serverRoom', e.target.value)}
-                      />
-                    )}
-                  </div>
-                  <div className="space-option">
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={formData.additionalSpaces.other.required}
-                        onChange={() => handleAdditionalSpaceToggle('other')}
-                      />
-                      기타
-                    </label>
-                    {formData.additionalSpaces.other.required && (
-                      <input
-                        type="text"
-                        placeholder="공간 용도와 크기 입력"
-                        value={formData.additionalSpaces.other.size}
-                        onChange={(e) => handleAdditionalSpaceSizeChange('other', e.target.value)}
-                      />
-                    )}
-                  </div>
+                  {[
+                    { id: 'reception', label: '리셉션' },
+                    { id: 'lounge', label: '라운지' },
+                    { id: 'breakRoom', label: '휴게실' },
+                    { id: 'storage', label: '창고' },
+                    { id: 'exhibition', label: '전시공간' },
+                    { id: 'serverRoom', label: '서버실' },
+                    { id: 'other', label: '기타' }
+                  ].map(opt => (
+                    <div key={opt.id} className="space-option" style={{ marginBottom: 12 }}>
+                      <label style={{ fontWeight: 700 }}>
+                        <input
+                          type="checkbox"
+                          checked={extraSpaces.includes(opt.id)}
+                          onChange={() => {
+                            setExtraSpaces(prev => prev.includes(opt.id)
+                              ? prev.filter(id => id !== opt.id)
+                              : [...prev, opt.id]);
+                          }}
+                        />
+                        {opt.label}
+                      </label>
+                      {/* 세부 항목 */}
+                      {extraSpaces.includes(opt.id) && (
+                        <div style={{ marginTop: 8, marginLeft: 16 }}>
+                          {opt.id === 'reception' && (
+                            <div>
+                              <label style={{ fontWeight: 600, marginBottom: 12 }}>상주 인원: </label>
+                              <input
+                                type="number"
+                                min="0"
+                                value={extraDetail.reception.count}
+                                onChange={e => setExtraDetail(d => ({ ...d, reception: { ...d.reception, count: e.target.value } }))}
+                                placeholder="숫자 입력"
+                                style={{ width: 200, marginLeft: 8 }}
+                              />
+                            </div>
+                          )}
+                          {opt.id === 'lounge' && (
+                            <>
+                              <div style={{ marginBottom: 4 }}>
+                                <label style={{ fontWeight: 600, marginBottom: 12 }}>좌석 구성: </label>
+                                <select
+                                  value={extraDetail.lounge.seat}
+                                  onChange={e => setExtraDetail(d => ({ ...d, lounge: { ...d.lounge, seat: e.target.value } }))}
+                                >
+                                  <option value="">선택</option>
+                                  <option value="table">테이블 중심</option>
+                                  <option value="casual">소파/쿠션 등 캐주얼</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label style={{ fontWeight: 600, marginBottom: 12, marginTop: 12 }}>사용 목적: </label>
+                                {['사내 커뮤니케이션 공간', '외부 손님 응대 공간'].map(purpose => (
+                                  <label key={purpose} style={{ marginRight: 12 }}>
+                                    <input
+                                      type="checkbox"
+                                      checked={extraDetail.lounge.purpose.includes(purpose)}
+                                      onChange={() => setExtraDetail(d => {
+                                        const exists = d.lounge.purpose.includes(purpose);
+                                        return {
+                                          ...d,
+                                          lounge: {
+                                            ...d.lounge,
+                                            purpose: exists
+                                              ? d.lounge.purpose.filter(p => p !== purpose)
+                                              : [...d.lounge.purpose, purpose]
+                                          }
+                                        };
+                                      })}
+                                    />
+                                    {purpose}
+                                  </label>
+                                ))}
+                              </div>
+                            </>
+                          )}
+                          {opt.id === 'breakRoom' && (
+                            <div style={{ marginBottom: 4 }}>
+                              <label style={{ fontWeight: 600, marginBottom: 12 }}>편의 시설: </label>
+                              {['리클라이너', '안마의자', '요가매트', '침대', '기타'].map(fac => (
+                                <label key={fac} style={{ marginRight: 12 }}>
+                                  <input
+                                    type="checkbox"
+                                    checked={extraDetail.breakRoom.facilities.includes(fac)}
+                                    onChange={() => setExtraDetail(d => {
+                                      const exists = d.breakRoom.facilities.includes(fac);
+                                      let newFacilities = exists
+                                        ? d.breakRoom.facilities.filter(f => f !== fac)
+                                        : [...d.breakRoom.facilities, fac];
+                                      // 기타 해제 시 입력값도 초기화
+                                      return {
+                                        ...d,
+                                        breakRoom: {
+                                          ...d.breakRoom,
+                                          facilities: newFacilities,
+                                          etc: fac === '기타' && !exists ? d.breakRoom.etc : (fac === '기타' && exists ? '' : d.breakRoom.etc)
+                                        }
+                                      };
+                                    })}
+                                  />
+                                  {fac}
+                                </label>
+                              ))}
+                              {extraDetail.breakRoom.facilities.includes('기타') && (
+                                <input
+                                  type="text"
+                                  value={extraDetail.breakRoom.etc}
+                                  onChange={e => setExtraDetail(d => ({ ...d, breakRoom: { ...d.breakRoom, etc: e.target.value } }))}
+                                  placeholder="기타 편의 시설"
+                                  style={{ marginLeft: 8, padding: '2px 6px', borderRadius: 4, border: '1px solid #ccc', width: 200 }}
+                                />
+                              )}
+                            </div>
+                          )}
+                          {opt.id === 'storage' && (
+                            <div>
+                              <label style={{ fontWeight: 600, marginBottom: 12 }}>랙/선반 구성:</label>
+                              {extraDetail.storage.racks.map((rack, idx) => (
+                                <div key={idx} style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
+                                  <input
+                                    type="text"
+                                    value={rack.size}
+                                    onChange={e => setExtraDetail(d => {
+                                      const racks = [...d.storage.racks];
+                                      racks[idx].size = e.target.value;
+                                      return { ...d, storage: { ...d.storage, racks } };
+                                    })}
+                                    placeholder="크기(가로mm x 세로mm)"
+                                    style={{ width: 200, marginLeft: 8, marginRight: 4 }}
+                                  />
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    value={rack.count}
+                                    onChange={e => setExtraDetail(d => {
+                                      const racks = [...d.storage.racks];
+                                      racks[idx].count = e.target.value;
+                                      return { ...d, storage: { ...d.storage, racks } };
+                                    })}
+                                    placeholder="수량"
+                                    style={{ width: 100, marginRight: 4 }}
+                                  />
+                                  <button type="button" onClick={() => setExtraDetail(d => {
+                                    const racks = d.storage.racks.filter((_, i) => i !== idx);
+                                    return { ...d, storage: { ...d.storage, racks: racks.length ? racks : [{ size: '', count: '' }] } };
+                                  })} style={{ marginLeft: 4 }}>삭제</button>
+                                </div>
+                              ))}
+                              <button type="button" onClick={() => setExtraDetail(d => ({ ...d, storage: { ...d.storage, racks: [...d.storage.racks, { size: '', count: '' }] } }))} style={{ marginLeft: 8, marginTop: 4 }}>+ 추가</button>
+                            </div>
+                          )}
+                          {opt.id === 'exhibition' && (
+                            <div>
+                              <label style={{ fontWeight: 600, marginBottom: 12 }}>사용 목적: </label>
+                              {['기업 소개', '브랜드 전시', '제품 전시', '기타'].map(purpose => (
+                                <label key={purpose} style={{ marginRight: 12 }}>
+                                  <input
+                                    type="checkbox"
+                                    checked={extraDetail.exhibition.purpose.includes(purpose)}
+                                    onChange={() => setExtraDetail(d => {
+                                      const exists = d.exhibition.purpose.includes(purpose);
+                                      return {
+                                        ...d,
+                                        exhibition: {
+                                          ...d.exhibition,
+                                          purpose: exists
+                                            ? d.exhibition.purpose.filter(p => p !== purpose)
+                                            : [...d.exhibition.purpose, purpose]
+                                        }
+                                      };
+                                    })}
+                                  />
+                                  {purpose}
+                                </label>
+                              ))}
+                              {extraDetail.exhibition.purpose.includes('기타') && (
+                                <input
+                                  type="text"
+                                  value={extraDetail.exhibition.etc}
+                                  onChange={e => setExtraDetail(d => ({ ...d, exhibition: { ...d.exhibition, etc: e.target.value } }))}
+                                  placeholder="기타 목적"
+                                  style={{ marginLeft: 8, padding: '2px 6px', borderRadius: 4, border: '1px solid #ccc', width: 200 }}
+                                />
+                              )}
+                            </div>
+                          )}
+                          {opt.id === 'serverRoom' && (
+                            <div>
+                              <label style={{ fontWeight: 600, marginBottom: 12 }}>필요 기기: </label>
+                              {['서버랙', '항온항습기', '기타'].map(item => (
+                                <label key={item} style={{ marginRight: 16 }}>
+                                  <input
+                                    type="checkbox"
+                                    checked={
+                                      item === '서버랙' ? extraDetail.serverRoom.rack :
+                                        item === '항온항습기' ? extraDetail.serverRoom.aircon :
+                                          extraDetail.serverRoom.etcChecked
+                                    }
+                                    onChange={e => {
+                                      if (item === '서버랙') setExtraDetail(d => ({ ...d, serverRoom: { ...d.serverRoom, rack: e.target.checked } }));
+                                      else if (item === '항온항습기') setExtraDetail(d => ({ ...d, serverRoom: { ...d.serverRoom, aircon: e.target.checked } }));
+                                      else setExtraDetail(d => ({ ...d, serverRoom: { ...d.serverRoom, etcChecked: e.target.checked, etc: e.target.checked ? d.serverRoom.etc : '' } }));
+                                    }}
+                                  />
+                                  {item}
+                                </label>
+                              ))}
+                              {extraDetail.serverRoom.etcChecked && (
+                                <input
+                                  type="text"
+                                  value={extraDetail.serverRoom.etc}
+                                  onChange={e => setExtraDetail(d => ({ ...d, serverRoom: { ...d.serverRoom, etc: e.target.value } }))}
+                                  placeholder="기타 필요 기기"
+                                  style={{ marginLeft: 8, padding: '2px 6px', borderRadius: 4, border: '1px solid #ccc', width: 200 }}
+                                />
+                              )}
+                            </div>
+                          )}
+                          {opt.id === 'other' && (
+                            <div>
+                              <input
+                                type="text"
+                                value={extraDetail.other.desc}
+                                onChange={e => setExtraDetail(d => ({ ...d, other: { ...d.other, desc: e.target.value } }))}
+                                placeholder="추가 공간 및 구성"
+                                style={{ padding: '2px 6px', borderRadius: 4, border: '1px solid #ccc', width: 450 }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
