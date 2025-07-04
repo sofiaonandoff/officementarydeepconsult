@@ -2,16 +2,52 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/InitialInfo.css';
 
+// 카카오 주소 API 스크립트 로드 함수
+function loadDaumPostcodeScript(callback) {
+  if (document.getElementById('daum-postcode-script')) {
+    callback();
+    return;
+  }
+  const script = document.createElement('script');
+  script.id = 'daum-postcode-script';
+  script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+  script.onload = callback;
+  document.body.appendChild(script);
+}
+
 const InitialInfo = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [emailError, setEmailError] = useState('');
   const [workStyleOther, setWorkStyleOther] = useState('');
+  const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
+  const [brandLogo, setBrandLogo] = useState(null);
+  const [brandLogoPreview, setBrandLogoPreview] = useState(null);
+  const [brandColors, setBrandColors] = useState(['#000000']);
+  const [brandGuide, setBrandGuide] = useState(null);
+  const [brandGuideName, setBrandGuideName] = useState('');
+  const [referenceImages, setReferenceImages] = useState([]);
+  const [referencePreviews, setReferencePreviews] = useState([]);
+  const [canteenOptions, setCanteenOptions] = useState([]);
+  const [canteenOther, setCanteenOther] = useState('');
+  const [meetingOptions, setMeetingOptions] = useState([]);
+  const [meetingOther, setMeetingOther] = useState('');
 
   // 초기 formData 상태
   const initialFormData = {
     companyName: '',
+    projectPurpose: '', // 이전 / 확장 / 신규(구축/신축)
+    buildingType: '', // 구축 or 신축 (projectPurpose가 신규일 때)
+    buildingAddress: '',
+    buildingFloors: '',
+    buildingSize: '', // 평수 or m²
+    budgetDetail: '', // 구체적인 예산
+    directOrder: [], // 직접 발주 사항 (다중 선택)
+    directOrderEtc: '', // 직접 발주 기타 입력
+    constructionStart: '', // 착공 가능일
+    constructionEnd: '', // 완료 희망일
+    constructionTimes: [], // 공사 가능 시간 (다중 선택)
     contactName: '',
     contactPhone: '',
     contactEmail: '',
@@ -384,10 +420,10 @@ const InitialInfo = () => {
   };
 
   const handleNext = () => {
-    if (step < 3) {
+    if (step < 4) {
       setStep(step + 1);
     } else {
-      // 다음 단계로 이동
+      // 4단계에서만 요약 페이지로 이동
       const mergedFormData = {
         ...formData,
         workStyleOther
@@ -397,18 +433,51 @@ const InitialInfo = () => {
   };
 
   const handleSkip = () => {
-    if (step === 2 || step === 3) {
-      if (step === 2) {
-        setStep(3);
-      } else {
-        // 다음 단계로 이동
-        const mergedFormData = {
-          ...formData,
-          workStyleOther
-        };
-        navigate('/design-preview', { state: { formData: mergedFormData } });
-      }
+    if (step === 2) {
+      setStep(3);
+    } else if (step === 3) {
+      setStep(4);
+    } else if (step === 4) {
+      const mergedFormData = {
+        ...formData,
+        workStyleOther
+      };
+      navigate('/design-preview', { state: { formData: mergedFormData } });
     }
+  };
+
+  const directOrderOptions = [
+    { id: 'security', label: '보안' },
+    { id: 'network', label: '통신' },
+    { id: 'av', label: 'AV' },
+    { id: 'move', label: '이사' },
+    { id: 'furniture', label: '가구' },
+    { id: 'landscape', label: '조경' },
+    { id: 'none', label: '없음' },
+    { id: 'etc', label: '기타' }
+  ];
+
+  const constructionTimeOptions = [
+    { id: 'weekday-day', label: '평일 주간' },
+    { id: 'weekday-night', label: '평일 야간' },
+    { id: 'weekend-day', label: '주말 주간' },
+    { id: 'weekend-night', label: '주말 야간' }
+  ];
+
+  // 주소 검색 완료 시 호출
+  const handleAddressSearch = () => {
+    loadDaumPostcodeScript(() => {
+      setIsPostcodeOpen(true);
+      new window.daum.Postcode({
+        oncomplete: function (data) {
+          setFormData(prev => ({ ...prev, buildingAddress: data.address }));
+          setIsPostcodeOpen(false);
+        },
+        onclose: function () {
+          setIsPostcodeOpen(false);
+        }
+      }).open({ popupName: 'postcodePopup' });
+    });
   };
 
   const renderStep = () => {
@@ -416,7 +485,7 @@ const InitialInfo = () => {
       case 1:
         return (
           <div className="step-container">
-            <h2>기본 정보 입력</h2>
+            <h2>프로젝트 기본 정보</h2>
             <div className="input-group">
               <div className="input-field">
                 <label>회사 이름 <span className="required">*</span></label>
@@ -428,119 +497,212 @@ const InitialInfo = () => {
                   placeholder="회사명을 입력하세요"
                 />
               </div>
-              <div className="contact-info">
-                <div className="input-field">
-                  <label>담당자 이름 <span className="required">*</span></label>
-                  <input
-                    type="text"
-                    name="contactName"
-                    value={formData.contactName}
-                    onChange={handleInputChange}
-                    placeholder="담당자 이름을 입력하세요"
-                  />
-                </div>
-                <div className="input-field">
-                  <label>연락처 <span className="required">*</span></label>
-                  <input
-                    type="tel"
-                    name="contactPhone"
-                    value={formData.contactPhone}
-                    onChange={handleInputChange}
-                    placeholder="연락처를 입력하세요"
-                  />
-                </div>
-              </div>
               <div className="input-field">
-                <label>이메일 <span className="required">*</span></label>
-                <input
-                  type="email"
-                  name="contactEmail"
-                  value={formData.contactEmail}
-                  onChange={handleInputChange}
-                  placeholder="이메일을 입력하세요"
-                />
-                {emailError && <span className="error-message">{emailError}</span>}
-              </div>
-              <div className="input-field">
-                <label>오피스 공간 크기</label>
-                <div className="size-input">
-                  <input
-                    type="number"
-                    name="spaceSize"
-                    value={formData.spaceSize}
-                    onChange={handleInputChange}
-                    placeholder="평수 입력"
-                    min="1"
-                  />
-                  <span className="unit">평</span>
-                </div>
-              </div>
-              <div className="input-field">
-                <label>오피스 총 인원</label>
-                <div className="size-input">
-                  <input
-                    type="number"
-                    name="totalEmployees"
-                    value={formData.totalEmployees}
-                    onChange={handleInputChange}
-                    placeholder="인원 수 입력"
-                    min="1"
-                  />
-                  <span className="unit">명</span>
-                </div>
-              </div>
-              <div className="input-field">
-                <label>예산 범위</label>
-                <div className="budget-options">
-                  {budgetOptions.map((option) => (
+                <label>프로젝트 목적 <span className="required">*</span></label>
+                <div className="seating-options" style={{ marginTop: 8, display: 'flex', flexWrap: 'nowrap', justifyContent: 'flex-start' }}>
+                  {[
+                    { id: 'move', label: '이전', desc: '기존 사무실에서 새로운 공간으로 이전' },
+                    { id: 'expand', label: '확장', desc: '기존 공간의 확장 또는 추가' },
+                    { id: 'new', label: '신규', desc: '신규 오피스 설계' }
+                  ].map(opt => (
                     <button
-                      key={option.id}
-                      className={`budget-option ${formData.budget === option.id ? 'selected' : ''}`}
-                      onClick={() => handleInputChange({ target: { name: 'budget', value: option.id } })}
+                      key={opt.id}
+                      type="button"
+                      className={`seating-option${formData.projectPurpose === opt.id ? ' selected' : ''}`}
+                      onClick={() => handleInputChange({ target: { name: 'projectPurpose', value: opt.id } })}
+                      style={{ width: 200, minWidth: 160, marginRight: 12, marginBottom: 0 }}
                     >
-                      <h4>{option.label}</h4>
-                      <p>{option.range}</p>
+                      <h4 style={{ margin: 0 }}>{opt.label}</h4>
+                      <p style={{ fontSize: 13, color: '#666', margin: '4px 0 0 0', minHeight: 18 }}>{opt.desc}</p>
                     </button>
                   ))}
                 </div>
-                {formData.spaceSize && formData.budget && (
-                  <div className="estimated-budget">
-                    <p>예상 총 예산: {
-                      formData.budget === 'signature'
-                        ? calculateEstimatedBudget().max
-                        : `${calculateEstimatedBudget().min} ~ ${calculateEstimatedBudget().max}`
-                    }</p>
+                {formData.projectPurpose === 'new' && (
+                  <div style={{ marginTop: 12 }}>
+                    <label style={{ marginRight: 8 }}>신규 유형:</label>
+                    {[
+                      { id: 'built', label: '구축 건물' },
+                      { id: 'newly', label: '신축 건물' }
+                    ].map(opt => (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        className={`building-type-btn${formData.buildingType === opt.id ? ' selected' : ''}`}
+                        style={{
+                          padding: '6px 16px',
+                          borderRadius: 8,
+                          border: formData.buildingType === opt.id ? '2px solid #007bff' : '1px solid #ccc',
+                          background: formData.buildingType === opt.id ? '#e6f0ff' : '#fff',
+                          fontWeight: formData.buildingType === opt.id ? 700 : 400,
+                          cursor: 'pointer',
+                          marginRight: 8,
+                          transition: 'all 0.2s'
+                        }}
+                        onClick={() => handleInputChange({ target: { name: 'buildingType', value: opt.id } })}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
                   </div>
                 )}
               </div>
-              <div className="schedule-inputs">
+              <div className="input-field" style={{ display: 'flex', alignItems: 'flex-end', gap: 8, marginBottom: 16, width: '100%' }}>
+                <div style={{ flex: 1, width: '100%' }}>
+                  <label>건물 주소 <span className="required">*</span></label>
+                  <input
+                    type="text"
+                    name="buildingAddress"
+                    value={formData.buildingAddress}
+                    onChange={handleInputChange}
+                    placeholder="건물 주소를 입력하세요"
+                    readOnly
+                    style={{ width: '100%' }}
+                  />
+                </div>
+                <button type="button" style={{ height: 36, minWidth: 90, marginBottom: 2 }} onClick={handleAddressSearch}>주소 검색</button>
+              </div>
+              <div className="input-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div className="input-field">
-                  <label>시작 일정</label>
-                  <div className="schedule-input">
-                    <input
-                      type="date"
-                      name="startSchedule"
-                      value={formData.startSchedule}
-                      onChange={handleInputChange}
-                      min={new Date().toISOString().slice(0, 10)}
-                      placeholder="시작 일자 선택"
-                      className="styled-date-input"
-                    />
-                  </div>
+                  <label>건물 규모 <span className="required">*</span></label>
+                  <input
+                    type="text"
+                    name="buildingSize"
+                    value={formData.buildingSize}
+                    onChange={handleInputChange}
+                    placeholder="예: 300평 또는 1000m²"
+                  />
                 </div>
                 <div className="input-field">
-                  <label>공사 완료 일정</label>
-                  <div className="schedule-input">
-                    <input
-                      type="date"
-                      name="endSchedule"
-                      value={formData.endSchedule}
-                      onChange={handleInputChange}
-                      min={formData.startSchedule ? formData.startSchedule : new Date().toISOString().slice(0, 10)}
-                      placeholder="완료 일자 선택"
-                      className="styled-date-input"
-                    />
-                  </div>
+                  <label>건물 층수 <span className="required">*</span></label>
+                  <input
+                    type="number"
+                    name="buildingFloors"
+                    value={formData.buildingFloors}
+                    onChange={handleInputChange}
+                    placeholder="건물 층수"
+                    min="1"
+                  />
+                </div>
+              </div>
+              <div className="input-field">
+                <label>직접 발주 사항</label>
+                <div className="work-style-options">
+                  {directOrderOptions.map(opt => {
+                    const checked = formData.directOrder.includes(opt.id);
+                    return (
+                      <span key={opt.id} style={{ display: 'inline-block', marginRight: 8 }}>
+                        <button
+                          type="button"
+                          className={`work-style-checkbox work-style-btn${checked ? ' selected' : ''}`}
+                          style={{
+                            display: 'inline-block',
+                            margin: '0 8px 8px 0',
+                            cursor: 'pointer',
+                            border: checked ? '2px solid #007bff' : '1px solid #ccc',
+                            borderRadius: '8px',
+                            padding: '10px 16px',
+                            background: checked ? '#e6f0ff' : '#fff',
+                            transition: 'all 0.2s',
+                            fontWeight: checked ? 700 : 400,
+                            width: 160,
+                            minWidth: 140
+                          }}
+                          onClick={() => {
+                            setFormData(prev => {
+                              const exists = prev.directOrder.includes(opt.id);
+                              let newDirectOrder = exists
+                                ? prev.directOrder.filter(id => id !== opt.id)
+                                : [...prev.directOrder, opt.id];
+                              // 기타 해제 시 입력값도 초기화
+                              let etcValue = prev.directOrderEtc;
+                              if (opt.id === 'etc' && exists) etcValue = '';
+                              return {
+                                ...prev,
+                                directOrder: newDirectOrder,
+                                directOrderEtc: etcValue
+                              };
+                            });
+                          }}
+                        >
+                          {opt.label}
+                        </button>
+                        {opt.id === 'etc' && checked && (
+                          <input
+                            type="text"
+                            value={formData.directOrderEtc}
+                            onChange={e => setFormData(prev => ({ ...prev, directOrderEtc: e.target.value }))}
+                            placeholder="기타 직접 발주 사항 입력"
+                            style={{ marginLeft: 8, padding: '2px 6px', borderRadius: 4, border: '1px solid #ccc', width: 140 }}
+                          />
+                        )}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="input-field">
+                <label>공사 희망 일정</label>
+                <div className="schedule-input">
+                  <input
+                    type="date"
+                    name="constructionStart"
+                    value={formData.constructionStart}
+                    onChange={handleInputChange}
+                    min={new Date().toISOString().slice(0, 10)}
+                    placeholder="착공 가능일"
+                    className="styled-date-input"
+                  />
+                  <span style={{ margin: '0 8px' }}>~</span>
+                  <input
+                    type="date"
+                    name="constructionEnd"
+                    value={formData.constructionEnd}
+                    onChange={handleInputChange}
+                    min={formData.constructionStart ? formData.constructionStart : new Date().toISOString().slice(0, 10)}
+                    placeholder="완료 희망일"
+                    className="styled-date-input"
+                  />
+                </div>
+              </div>
+              <div className="input-field">
+                <label>공사 가능 시간</label>
+                <div className="work-style-options">
+                  {constructionTimeOptions.map(opt => {
+                    const checked = formData.constructionTimes.includes(opt.id);
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        className={`work-style-checkbox work-style-btn${checked ? ' selected' : ''}`}
+                        style={{
+                          display: 'inline-block',
+                          margin: '0 8px 8px 0',
+                          cursor: 'pointer',
+                          border: checked ? '2px solid #007bff' : '1px solid #ccc',
+                          borderRadius: '8px',
+                          padding: '10px 16px',
+                          background: checked ? '#e6f0ff' : '#fff',
+                          transition: 'all 0.2s',
+                          fontWeight: checked ? 700 : 400,
+                          width: 160,
+                          minWidth: 140
+                        }}
+                        onClick={() => {
+                          setFormData(prev => {
+                            const exists = prev.constructionTimes.includes(opt.id);
+                            return {
+                              ...prev,
+                              constructionTimes: exists
+                                ? prev.constructionTimes.filter(id => id !== opt.id)
+                                : [...prev.constructionTimes, opt.id]
+                            };
+                          });
+                        }}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -549,12 +711,22 @@ const InitialInfo = () => {
       case 2:
         return (
           <div className="step-container">
-            <h2>업무 공간 설정</h2>
+            <h2>디자인 방향성 설정</h2>
             <div className="space-settings">
               <div className="setting-section">
-                <h3>업무 형태 선택</h3>
+                <h3>디자인 키워드</h3>
                 <div className="work-style-options">
-                  {workStyles.map((style) => {
+                  {[
+                    { id: 'minimal', label: 'Minimal & Sleek', icon: '🧊', desc: '미니멀하고 매끄러운' },
+                    { id: 'natural', label: 'Natural & Calm', icon: '🌿', desc: '자연스럽고 차분한' },
+                    { id: 'industrial', label: 'Industrial & Urban', icon: '🏙️', desc: '노출 구조, 도심 감성' },
+                    { id: 'warm', label: 'Warm & Cozy', icon: '🌞', desc: '따뜻하고 아늑한' },
+                    { id: 'futuristic', label: 'Futuristic & Techy', icon: '🌀', desc: '미래지향적이고 기술적인' },
+                    { id: 'playful', label: 'Playful & Creative', icon: '🌈', desc: '유쾌하고 창의적인' },
+                    { id: 'classic', label: 'Classic & Elegant', icon: '📚', desc: '고전적이고 정제된' },
+                    { id: 'layered', label: 'Layered & Textured', icon: '✨', desc: '복합적이고 입체감 있는' },
+                    { id: 'other', label: '기타', icon: '➕', desc: '' }
+                  ].map((style) => {
                     const checked = formData.workStyle.includes(style.id);
                     return (
                       <label
@@ -570,12 +742,13 @@ const InitialInfo = () => {
                         />
                         <span className="icon" style={{ marginRight: 6 }}>{style.icon}</span>
                         {style.label}
+                        {style.desc && <span style={{ display: 'block', fontSize: 12, color: '#888', marginTop: 2 }}>{style.desc}</span>}
                         {style.id === 'other' && checked && (
                           <input
                             type="text"
                             value={workStyleOther}
                             onChange={e => setWorkStyleOther(e.target.value)}
-                            placeholder="기타 업무 형태 입력"
+                            placeholder="기타 디자인 키워드 입력"
                             style={{ marginLeft: 8, padding: '2px 6px', borderRadius: 4, border: '1px solid #ccc', width: 120 }}
                           />
                         )}
@@ -586,34 +759,154 @@ const InitialInfo = () => {
               </div>
 
               <div className="setting-section">
-                <h3>좌석제도 선택</h3>
-                <div className="seating-options">
-                  {seatingTypes.map((type) => (
-                    <button
-                      key={type.id}
-                      className={`seating-option ${formData.seatingType === type.id ? 'selected' : ''}`}
-                      onClick={() => handleInputChange({ target: { name: 'seatingType', value: type.id } })}
-                    >
-                      <h4>{type.label}</h4>
-                      <p>{type.description}</p>
-                    </button>
-                  ))}
+                <h3>브랜드 아이덴티티</h3>
+                <div className="brand-identity-fields" style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 8 }}>
+                  {/* 로고 업로드 */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <label style={{ minWidth: 90 }}>브랜드 로고</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={e => {
+                        const file = e.target.files[0];
+                        setBrandLogo(file);
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = ev => setBrandLogoPreview(ev.target.result);
+                          reader.readAsDataURL(file);
+                        } else {
+                          setBrandLogoPreview(null);
+                        }
+                      }}
+                    />
+                    {brandLogoPreview && (
+                      <img src={brandLogoPreview} alt="로고 미리보기" style={{ width: 48, height: 48, objectFit: 'contain', border: '1px solid #eee', borderRadius: 8 }} />
+                    )}
+                  </div>
+                  {/* 브랜드 컬러 */}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+                    <label style={{ minWidth: 90, marginTop: 8 }}>브랜드 컬러</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {brandColors.map((color, idx) => (
+                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <input
+                            type="color"
+                            value={color}
+                            onChange={e => {
+                              const newColors = [...brandColors];
+                              newColors[idx] = e.target.value;
+                              setBrandColors(newColors);
+                            }}
+                            style={{ width: 36, height: 36, border: 'none', background: 'none' }}
+                          />
+                          <input
+                            type="text"
+                            value={color}
+                            onChange={e => {
+                              const newColors = [...brandColors];
+                              newColors[idx] = e.target.value;
+                              setBrandColors(newColors);
+                            }}
+                            style={{ width: 90, marginLeft: 8 }}
+                            maxLength={7}
+                          />
+                          {brandColors.length > 1 && (
+                            <button type="button" style={{ marginLeft: 4 }} onClick={() => {
+                              setBrandColors(brandColors.filter((_, i) => i !== idx));
+                            }}>삭제</button>
+                          )}
+                        </div>
+                      ))}
+                      <button type="button" style={{ marginTop: 4, width: 200 }} onClick={() => setBrandColors([...brandColors, '#000000'])}>컬러 추가</button>
+                    </div>
+                  </div>
+                  {/* 디자인 가이드 업로드 */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <label style={{ minWidth: 90 }}>디자인 가이드</label>
+                    <input
+                      type="file"
+                      accept=".pdf,.ai,.psd,.zip,.ppt,.pptx,.doc,.docx,.hwp,.jpg,.png"
+                      onChange={e => {
+                        const file = e.target.files[0];
+                        setBrandGuide(file);
+                        setBrandGuideName(file ? file.name : '');
+                      }}
+                    />
+                    {brandGuideName && (
+                      <span style={{ fontSize: 13, color: '#555' }}>{brandGuideName}</span>
+                    )}
+                  </div>
                 </div>
               </div>
 
               <div className="setting-section">
-                <h3>업무 공간 유연성</h3>
-                <div className="flexibility-options">
-                  {flexibilityLevels.map((level) => (
-                    <button
-                      key={level.id}
-                      className={`flexibility-option ${formData.workStyleFlexibility === level.id ? 'selected' : ''}`}
-                      onClick={() => handleInputChange({ target: { name: 'workStyleFlexibility', value: level.id } })}
-                    >
-                      <h4>{level.label}</h4>
-                      <p>{level.description}</p>
-                    </button>
-                  ))}
+                <h3>업무 공간 분위기</h3>
+                <div className="seating-options">
+                  {[
+                    { id: 'focus', label: 'Focus', desc: '집중이 잘 되는 공간' },
+                    { id: 'open', label: 'Open', desc: '대화를 유도하는 열린 공간' },
+                    { id: 'private', label: 'Private', desc: '조용하고 프라이빗한 느낌' },
+                    { id: 'teamwork', label: 'Teamwork', desc: '팀워크와 공동작업 중심' },
+                    { id: 'healing', label: 'Healing', desc: '회복과 휴식을 위한 공간' },
+                    { id: 'brand', label: 'Brand', desc: '브랜드 정체성을 잘 보여주는 공간' }
+                  ].map(type => {
+                    const checked = Array.isArray(formData.seatingType) ? formData.seatingType.includes(type.id) : false;
+                    return (
+                      <button
+                        key={type.id}
+                        className={`seating-option${checked ? ' selected' : ''}`}
+                        onClick={() => {
+                          // 다중 선택 토글
+                          let newArr = Array.isArray(formData.seatingType) ? [...formData.seatingType] : [];
+                          if (checked) {
+                            newArr = newArr.filter(id => id !== type.id);
+                          } else {
+                            newArr.push(type.id);
+                          }
+                          handleInputChange({ target: { name: 'seatingType', value: newArr } });
+                        }}
+                        style={{ width: 300, minWidth: 160, marginRight: 12, marginBottom: 8, textAlign: 'left', padding: '16px 20px' }}
+                      >
+                        <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{type.label}</div>
+                        <div style={{ fontSize: 14, color: '#666' }}>{type.desc}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="setting-section">
+                <h3>선호하는 레퍼런스 이미지</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={e => {
+                      const files = Array.from(e.target.files);
+                      // 기존 이미지에 새 파일을 누적
+                      const newImages = [...referenceImages, ...files];
+                      setReferenceImages(newImages);
+                      // 미리보기 누적
+                      Promise.all(files.map(file => {
+                        return new Promise(resolve => {
+                          const reader = new FileReader();
+                          reader.onload = ev => resolve(ev.target.result);
+                          reader.readAsDataURL(file);
+                        });
+                      })).then(newPreviews => {
+                        setReferencePreviews(prev => [...prev, ...newPreviews]);
+                      });
+                    }}
+                  />
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
+                    {referencePreviews.map((src, idx) => (
+                      <div key={idx} style={{ textAlign: 'center' }}>
+                        <img src={src} alt={`ref${idx}`} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8, border: '1px solid #eee' }} />
+                        <div style={{ fontSize: 12, color: '#555', marginTop: 2, maxWidth: 80, wordBreak: 'break-all' }}>{referenceImages[idx]?.name}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -622,138 +915,120 @@ const InitialInfo = () => {
       case 3:
         return (
           <div className="step-container">
-            <h2>상세 공간 요구사항</h2>
+            <h2>세부 공간 구성 및 활용 계획</h2>
             <div className="space-requirements">
               <div className="requirement-section">
-                <h3>개인 업무공간</h3>
-                <div className="workstation-inputs">
-                  <div className="input-field">
-                    <label>워크스테이션</label>
-                    <div className="count-input">
-                      <input
-                        type="number"
-                        name="count"
-                        value={formData.workstations.count}
-                        onChange={handleWorkstationChange}
-                        min="1"
-                        placeholder="워크스테이션 개수"
-                      />
-                    </div>
-                  </div>
-                  <div className="input-field">
-                    <label>크기 (cm)</label>
-                    <select
-                      name="size"
-                      value={formData.workstations.size}
-                      onChange={handleWorkstationChange}
-                    >
-                      <option value="140x70">140 x 70</option>
-                      <option value="150x70">150 x 70</option>
-                      <option value="160x70">160 x 70</option>
-                    </select>
-                  </div>
-                  <div className="input-field">
-                    <label>개인 락커</label>
-                    <div className="count-input">
-                      <input
-                        type="number"
-                        name="count"
-                        value={formData.lockers.count}
-                        onChange={(e) => handleInputChange({ target: { name: 'lockers', value: { count: e.target.value } } })}
-                        min="0"
-                        placeholder="락커 개수"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="oa-space-info">
-                  <p>OA 공간은 워크스테이션 수와 공간 크기에 맞춰 적정한 공간을 마련합니다.</p>
-                  <p>워크스테이션 간 통로, 프린터 공간, 서류 보관 공간 등이 포함됩니다.</p>
-                </div>
-                <div className="personal-space-inputs">
-                  <div className="space-count-input">
-                    <label>1인 포커스룸</label>
-                    <div className="count-controls">
-                      <button
-                        className="count-button"
-                        onClick={() => handleFocusRoomCountChange('single', Math.max(0, formData.focusRooms.single.count - 1))}
-                      >
-                        -
-                      </button>
-                      <span className="count">{formData.focusRooms.single.count}</span>
-                      <button
-                        className="count-button"
-                        onClick={() => handleFocusRoomCountChange('single', formData.focusRooms.single.count + 1)}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                  <div className="space-count-input">
-                    <label>2인 포커스룸</label>
-                    <div className="count-controls">
-                      <button
-                        className="count-button"
-                        onClick={() => handleFocusRoomCountChange('double', Math.max(0, formData.focusRooms.double.count - 1))}
-                      >
-                        -
-                      </button>
-                      <span className="count">{formData.focusRooms.double.count}</span>
-                      <button
-                        className="count-button"
-                        onClick={() => handleFocusRoomCountChange('double', formData.focusRooms.double.count + 1)}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                  <div className="space-count-input">
-                    <label>임원실(사무실)</label>
-                    <div className="count-controls">
-                      <button
-                        className="count-button"
-                        onClick={() => handleExecutiveRoomCountChange(Math.max(0, formData.executiveRooms.count - 1))}
-                      >
-                        -
-                      </button>
-                      <span className="count">{formData.executiveRooms.count}</span>
-                      <button
-                        className="count-button"
-                        onClick={() => handleExecutiveRoomCountChange(formData.executiveRooms.count + 1)}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
+                <h3>캔틴 구성</h3>
+                <div className="canteen-options" style={{ marginBottom: 16 }}>
+                  {[
+                    { id: 'water', label: '정수기' },
+                    { id: 'microwave', label: '전자레인지' },
+                    { id: 'sink', label: '싱크대' },
+                    { id: 'fridge', label: '냉장고' },
+                    { id: 'other', label: '기타' }
+                  ].map(opt => {
+                    const checked = canteenOptions.includes(opt.id);
+                    return (
+                      <span key={opt.id} style={{ display: 'inline-block', marginRight: 8 }}>
+                        <button
+                          type="button"
+                          className={`work-style-checkbox work-style-btn${checked ? ' selected' : ''}`}
+                          style={{
+                            display: 'inline-block',
+                            margin: '0 8px 8px 0',
+                            cursor: 'pointer',
+                            border: checked ? '2px solid #007bff' : '1px solid #ccc',
+                            borderRadius: '8px',
+                            padding: '10px 16px',
+                            background: checked ? '#e6f0ff' : '#fff',
+                            transition: 'all 0.2s',
+                            fontWeight: checked ? 700 : 400,
+                            minWidth: 100
+                          }}
+                          onClick={() => {
+                            setCanteenOptions(prev => {
+                              const exists = prev.includes(opt.id);
+                              if (exists) {
+                                // 기타 해제 시 입력값도 초기화
+                                if (opt.id === 'other') setCanteenOther('');
+                                return prev.filter(id => id !== opt.id);
+                              } else {
+                                return [...prev, opt.id];
+                              }
+                            });
+                          }}
+                        >
+                          {opt.label}
+                        </button>
+                        {opt.id === 'other' && checked && (
+                          <input
+                            type="text"
+                            value={canteenOther}
+                            onChange={e => setCanteenOther(e.target.value)}
+                            placeholder="추가 필요한 기기"
+                            style={{ marginLeft: 8, padding: '2px 6px', borderRadius: 4, border: '1px solid #ccc', width: 140 }}
+                          />
+                        )}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
 
               <div className="requirement-section">
-                <h3>회의실</h3>
-                <div className="meeting-room-options">
-                  {meetingRoomTypes.map((type) => (
-                    <div key={type.id} className="meeting-room-type">
-                      <div className="meeting-room-info">
-                        <h4>{type.label}</h4>
-                        <p>수용 인원: {type.capacity}</p>
-                      </div>
-                      <div className="meeting-room-count">
+                <h3>회의실 구성</h3>
+                <div className="meeting-room-options" style={{ marginBottom: 16, display: 'flex', flexWrap: 'nowrap', justifyContent: 'flex-start' }}>
+                  {[
+                    { id: 'video', label: '화상 회의 장비' },
+                    { id: 'tv', label: 'TV' },
+                    { id: 'whiteboard', label: '화이트보드' },
+                    { id: 'projector', label: '프로젝터' },
+                    { id: 'other', label: '기타' }
+                  ].map(opt => {
+                    const checked = meetingOptions.includes(opt.id);
+                    return (
+                      <span key={opt.id} style={{ display: 'inline-block', marginRight: 8 }}>
                         <button
-                          className="count-button"
-                          onClick={() => handleMeetingRoomCountChange(type.id, Math.max(0, formData.meetingRooms[type.id].count - 1))}
+                          type="button"
+                          className={`work-style-checkbox work-style-btn${checked ? ' selected' : ''}`}
+                          style={{
+                            display: 'inline-block',
+                            margin: '0 8px 8px 0',
+                            cursor: 'pointer',
+                            border: checked ? '2px solid #007bff' : '1px solid #ccc',
+                            borderRadius: '8px',
+                            padding: '10px 16px',
+                            background: checked ? '#e6f0ff' : '#fff',
+                            transition: 'all 0.2s',
+                            fontWeight: checked ? 700 : 400,
+                            minWidth: 100
+                          }}
+                          onClick={() => {
+                            setMeetingOptions(prev => {
+                              const exists = prev.includes(opt.id);
+                              if (exists) {
+                                if (opt.id === 'other') setMeetingOther('');
+                                return prev.filter(id => id !== opt.id);
+                              } else {
+                                return [...prev, opt.id];
+                              }
+                            });
+                          }}
                         >
-                          -
+                          {opt.label}
                         </button>
-                        <span className="count">{formData.meetingRooms[type.id].count}</span>
-                        <button
-                          className="count-button"
-                          onClick={() => handleMeetingRoomCountChange(type.id, formData.meetingRooms[type.id].count + 1)}
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                        {opt.id === 'other' && checked && (
+                          <input
+                            type="text"
+                            value={meetingOther}
+                            onChange={e => setMeetingOther(e.target.value)}
+                            placeholder="추가 필요한 장비"
+                            style={{ marginLeft: 8, padding: '2px 6px', borderRadius: 4, border: '1px solid #ccc', width: 140 }}
+                          />
+                        )}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -891,6 +1166,139 @@ const InitialInfo = () => {
             </div>
           </div>
         );
+      case 4:
+        return (
+          <div className="step-container">
+            <h2>기본 정보 입력 (최종 확인)</h2>
+            <div className="input-group">
+              <div className="input-field">
+                <label>회사 이름 <span className="required">*</span></label>
+                <input
+                  type="text"
+                  name="companyName"
+                  value={formData.companyName}
+                  onChange={handleInputChange}
+                  placeholder="회사명을 입력하세요"
+                />
+              </div>
+              <div className="contact-info">
+                <div className="input-field">
+                  <label>담당자 이름 <span className="required">*</span></label>
+                  <input
+                    type="text"
+                    name="contactName"
+                    value={formData.contactName}
+                    onChange={handleInputChange}
+                    placeholder="담당자 이름을 입력하세요"
+                  />
+                </div>
+                <div className="input-field">
+                  <label>연락처 <span className="required">*</span></label>
+                  <input
+                    type="tel"
+                    name="contactPhone"
+                    value={formData.contactPhone}
+                    onChange={handleInputChange}
+                    placeholder="연락처를 입력하세요"
+                  />
+                </div>
+              </div>
+              <div className="input-field">
+                <label>이메일 <span className="required">*</span></label>
+                <input
+                  type="email"
+                  name="contactEmail"
+                  value={formData.contactEmail}
+                  onChange={handleInputChange}
+                  placeholder="이메일을 입력하세요"
+                />
+                {emailError && <span className="error-message">{emailError}</span>}
+              </div>
+              <div className="input-field">
+                <label>오피스 공간 크기</label>
+                <div className="size-input">
+                  <input
+                    type="number"
+                    name="spaceSize"
+                    value={formData.spaceSize}
+                    onChange={handleInputChange}
+                    placeholder="평수 입력"
+                    min="1"
+                  />
+                  <span className="unit">평</span>
+                </div>
+              </div>
+              <div className="input-field">
+                <label>오피스 총 인원</label>
+                <div className="size-input">
+                  <input
+                    type="number"
+                    name="totalEmployees"
+                    value={formData.totalEmployees}
+                    onChange={handleInputChange}
+                    placeholder="인원 수 입력"
+                    min="1"
+                  />
+                  <span className="unit">명</span>
+                </div>
+              </div>
+              <div className="input-field">
+                <label>예산 범위</label>
+                <div className="budget-options">
+                  {budgetOptions.map((option) => (
+                    <button
+                      key={option.id}
+                      className={`budget-option ${formData.budget === option.id ? 'selected' : ''}`}
+                      onClick={() => handleInputChange({ target: { name: 'budget', value: option.id } })}
+                    >
+                      <h4>{option.label}</h4>
+                      <p>{option.range}</p>
+                    </button>
+                  ))}
+                </div>
+                {formData.spaceSize && formData.budget && (
+                  <div className="estimated-budget">
+                    <p>예상 총 예산: {
+                      formData.budget === 'signature'
+                        ? calculateEstimatedBudget().max
+                        : `${calculateEstimatedBudget().min} ~ ${calculateEstimatedBudget().max}`
+                    }</p>
+                  </div>
+                )}
+              </div>
+              <div className="schedule-inputs">
+                <div className="input-field">
+                  <label>시작 일정</label>
+                  <div className="schedule-input">
+                    <input
+                      type="date"
+                      name="startSchedule"
+                      value={formData.startSchedule}
+                      onChange={handleInputChange}
+                      min={new Date().toISOString().slice(0, 10)}
+                      placeholder="시작 일자 선택"
+                      className="styled-date-input"
+                    />
+                  </div>
+                </div>
+                <div className="input-field">
+                  <label>공사 완료 일정</label>
+                  <div className="schedule-input">
+                    <input
+                      type="date"
+                      name="endSchedule"
+                      value={formData.endSchedule}
+                      onChange={handleInputChange}
+                      min={formData.startSchedule ? formData.startSchedule : new Date().toISOString().slice(0, 10)}
+                      placeholder="완료 일자 선택"
+                      className="styled-date-input"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
       default:
         return null;
     }
@@ -899,7 +1307,7 @@ const InitialInfo = () => {
   return (
     <div className="initial-info-container">
       <div className="progress-bar">
-        <div className="progress" style={{ width: `${(step / 3) * 100}%` }} />
+        <div className="progress" style={{ width: `${(step / 4) * 100}%` }} />
       </div>
       {renderStep()}
       <div className="navigation-buttons">
@@ -917,15 +1325,25 @@ const InitialInfo = () => {
           className="next-button"
           onClick={handleNext}
           disabled={
-            (step === 1 && (!formData.companyName || !formData.contactName ||
+            (step === 1 && (
+              !formData.companyName ||
+              !formData.projectPurpose ||
+              (formData.projectPurpose === 'new' && !formData.buildingType) ||
+              !formData.buildingAddress ||
+              !formData.buildingFloors ||
+              !formData.buildingSize
+            )) ||
+            (step === 2 && ((Array.isArray(formData.seatingType) ? formData.seatingType.length === 0 : true) || formData.workStyle.length === 0)) ||
+            (step === 4 && (!formData.companyName || !formData.contactName ||
               !formData.contactPhone || !formData.contactEmail ||
-              emailError || !validateEmail(formData.contactEmail))) ||
-            (step === 2 && (!formData.seatingType || formData.workStyle.length === 0 || !formData.workStyleFlexibility))
+              emailError || !validateEmail(formData.contactEmail)))
           }
         >
-          {step === 3 ? '댜음' : '다음'}
+          {step === 4 ? '제출' : '다음'}
         </button>
       </div>
+      {/* 주소 검색 모달(카카오)용 더미 div */}
+      {isPostcodeOpen && <div id="postcode-layer" />}
     </div>
   );
 };
