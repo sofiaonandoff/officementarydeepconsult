@@ -1288,131 +1288,182 @@ const InitialInfo = () => {
       case 4:
         return (
           <div className="step-container">
-            <h2>기본 정보 입력 (최종 확인)</h2>
-            <div className="input-group">
-              <div className="input-field">
-                <label>회사 이름 <span className="required">*</span></label>
-                <input
-                  type="text"
-                  name="companyName"
-                  value={formData.companyName}
-                  onChange={handleInputChange}
-                  placeholder="회사명을 입력하세요"
-                />
-              </div>
-              <div className="contact-info">
+            <h2>현장 정보 및 설비 조건</h2>
+            <div className="site-info-blocks" style={{ display: 'flex', flexWrap: 'wrap', gap: 32, marginTop: 24 }}>
+              {/* 건물 정보 */}
+              <div className="site-info-card" style={{ flex: '1 1 180px', minWidth: 180, background: '#fafbfc', borderRadius: 16, boxShadow: '0 2px 8px #0001', padding: 28, marginBottom: 24 }}>
+                <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 18, color: '#1a237e' }}>건물 정보</h3>
                 <div className="input-field">
-                  <label>담당자 이름 <span className="required">*</span></label>
+                  <label style={{ fontWeight: 600, marginBottom: 8 }}>건물 내 들어와 있는 통신 회사</label>
+                  <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                    {['KT', 'LG U+', 'SKT', '기타'].map(com => (
+                      <label key={com} style={{ marginRight: 12 }}>
+                        <input
+                          type="checkbox"
+                          checked={Array.isArray(formData.buildingTelecom) ? formData.buildingTelecom.includes(com) : false}
+                          onChange={() => {
+                            let arr = Array.isArray(formData.buildingTelecom) ? [...formData.buildingTelecom] : [];
+                            if (arr.includes(com)) arr = arr.filter(c => c !== com);
+                            else arr.push(com);
+                            setFormData(prev => ({ ...prev, buildingTelecom: arr }));
+                          }}
+                        />
+                        {com}
+                      </label>
+                    ))}
+                    {Array.isArray(formData.buildingTelecom) && formData.buildingTelecom.includes('기타') && (
+                      <input
+                        type="text"
+                        value={formData.buildingTelecomEtc || ''}
+                        onChange={e => setFormData(prev => ({ ...prev, buildingTelecomEtc: e.target.value }))}
+                        placeholder="기타 통신사"
+                        style={{ marginLeft: 8, width: 180 }}
+                      />
+                    )}
+                  </div>
+                </div>
+                <div className="input-field">
+                  <label style={{ fontWeight: 600, marginBottom: 8 }}>제공 필요한 보험</label>
+                  <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                    {['영업배상책임보험', '기타'].map(ins => (
+                      <label key={ins} style={{ marginRight: 12 }}>
+                        <input
+                          type="checkbox"
+                          checked={Array.isArray(formData.buildingInsurance) ? formData.buildingInsurance.includes(ins) : false}
+                          onChange={() => {
+                            let arr = Array.isArray(formData.buildingInsurance) ? [...formData.buildingInsurance] : [];
+                            if (arr.includes(ins)) arr = arr.filter(i => i !== ins);
+                            else arr.push(ins);
+                            setFormData(prev => ({ ...prev, buildingInsurance: arr }));
+                          }}
+                        />
+                        {ins}
+                      </label>
+                    ))}
+                    {Array.isArray(formData.buildingInsurance) && formData.buildingInsurance.includes('기타') && (
+                      <input
+                        type="text"
+                        value={formData.buildingInsuranceEtc || ''}
+                        onChange={e => setFormData(prev => ({ ...prev, buildingInsuranceEtc: e.target.value }))}
+                        placeholder="기타 보험"
+                        style={{ marginLeft: 8, width: 180 }}
+                      />
+                    )}
+                  </div>
+                </div>
+                <div className="input-field">
+                  <label style={{ fontWeight: 600, marginBottom: 8 }}>시설 관리팀 연락처 제공 가능 여부</label>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <input
+                      type="checkbox"
+                      checked={formData.facilityContactProvided || false}
+                      onChange={e => setFormData(prev => ({ ...prev, facilityContactProvided: e.target.checked }))}
+                    />
+                    <span>제공 가능</span>
+                    {formData.facilityContactProvided && (
+                      <>
+                        <input
+                          type="text"
+                          value={formData.facilityContactName || ''}
+                          onChange={e => setFormData(prev => ({ ...prev, facilityContactName: e.target.value }))}
+                          placeholder="이름"
+                          style={{ marginLeft: 8, width: 120 }}
+                        />
+                        <input
+                          type="text"
+                          value={formData.facilityContactPhone || ''}
+                          onChange={e => setFormData(prev => ({ ...prev, facilityContactPhone: e.target.value }))}
+                          placeholder="연락처"
+                          style={{ marginLeft: 8, width: 140 }}
+                        />
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+              {/* 공간 정보 */}
+              <div className="site-info-card" style={{ flex: '1 1 180px', minWidth: 180, background: '#fafbfc', borderRadius: 16, boxShadow: '0 2px 8px #0001', padding: 28, marginBottom: 24 }}>
+                <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 18, color: '#1a237e' }}>공간 정보</h3>
+                <div className="input-field">
+                  <label style={{ fontWeight: 600, marginBottom: 8 }}>냉난방 시스템 실내기 타입/수량/용량</label>
                   <input
                     type="text"
-                    name="contactName"
-                    value={formData.contactName}
-                    onChange={handleInputChange}
-                    placeholder="담당자 이름을 입력하세요"
+                    value={formData.acIndoorSystem || ''}
+                    onChange={e => setFormData(prev => ({ ...prev, acIndoorSystem: e.target.value }))}
+                    placeholder="예: 실내기 3대(천장형, 20평형 등)"
                   />
                 </div>
                 <div className="input-field">
-                  <label>연락처 <span className="required">*</span></label>
+                  <label style={{ fontWeight: 600, marginBottom: 8 }}>냉난방 시스템 실외기 타입/수량/용량</label>
                   <input
-                    type="tel"
-                    name="contactPhone"
-                    value={formData.contactPhone}
-                    onChange={handleInputChange}
-                    placeholder="연락처를 입력하세요"
+                    type="text"
+                    value={formData.acOutdoorSystem || ''}
+                    onChange={e => setFormData(prev => ({ ...prev, acOutdoorSystem: e.target.value }))}
+                    placeholder="예: 실외기 2대(옥상, 30평형 등)"
                   />
-                </div>
-              </div>
-              <div className="input-field">
-                <label>이메일 <span className="required">*</span></label>
-                <input
-                  type="email"
-                  name="contactEmail"
-                  value={formData.contactEmail}
-                  onChange={handleInputChange}
-                  placeholder="이메일을 입력하세요"
-                />
-                {emailError && <span className="error-message">{emailError}</span>}
-              </div>
-              <div className="input-field">
-                <label>오피스 공간 크기</label>
-                <div className="size-input">
-                  <input
-                    type="number"
-                    name="spaceSize"
-                    value={formData.spaceSize}
-                    onChange={handleInputChange}
-                    placeholder="평수 입력"
-                    min="1"
-                  />
-                  <span className="unit">평</span>
-                </div>
-              </div>
-              <div className="input-field">
-                <label>오피스 총 인원</label>
-                <div className="size-input">
-                  <input
-                    type="number"
-                    name="totalEmployees"
-                    value={formData.totalEmployees}
-                    onChange={handleInputChange}
-                    placeholder="인원 수 입력"
-                    min="1"
-                  />
-                  <span className="unit">명</span>
-                </div>
-              </div>
-              <div className="input-field">
-                <label>예산 범위</label>
-                <div className="budget-options">
-                  {budgetOptions.map((option) => (
-                    <button
-                      key={option.id}
-                      className={`budget-option ${formData.budget === option.id ? 'selected' : ''}`}
-                      onClick={() => handleInputChange({ target: { name: 'budget', value: option.id } })}
-                    >
-                      <h4>{option.label}</h4>
-                      <p>{option.range}</p>
-                    </button>
-                  ))}
-                </div>
-                {formData.spaceSize && formData.budget && (
-                  <div className="estimated-budget">
-                    <p>예상 총 예산: {
-                      formData.budget === 'signature'
-                        ? calculateEstimatedBudget().max
-                        : `${calculateEstimatedBudget().min} ~ ${calculateEstimatedBudget().max}`
-                    }</p>
-                  </div>
-                )}
-              </div>
-              <div className="schedule-inputs">
-                <div className="input-field">
-                  <label>시작 일정</label>
-                  <div className="schedule-input">
-                    <input
-                      type="date"
-                      name="startSchedule"
-                      value={formData.startSchedule}
-                      onChange={handleInputChange}
-                      min={new Date().toISOString().slice(0, 10)}
-                      placeholder="시작 일자 선택"
-                      className="styled-date-input"
-                    />
-                  </div>
                 </div>
                 <div className="input-field">
-                  <label>공사 완료 일정</label>
-                  <div className="schedule-input">
-                    <input
-                      type="date"
-                      name="endSchedule"
-                      value={formData.endSchedule}
-                      onChange={handleInputChange}
-                      min={formData.startSchedule ? formData.startSchedule : new Date().toISOString().slice(0, 10)}
-                      placeholder="완료 일자 선택"
-                      className="styled-date-input"
-                    />
-                  </div>
+                  <label style={{ fontWeight: 600, marginBottom: 8 }}>에어컨 실외기 위치 및 여유 공간</label>
+                  <input
+                    type="text"
+                    value={formData.acOutdoorLocation || ''}
+                    onChange={e => setFormData(prev => ({ ...prev, acOutdoorLocation: e.target.value }))}
+                    placeholder="예: 옥상, 실외기실, 발코니 등"
+                  />
+                </div>
+                <div className="input-field">
+                  <label style={{ fontWeight: 600, marginBottom: 8 }}>할당 전기 용량</label>
+                  <input
+                    type="text"
+                    value={formData.electricCapacity || ''}
+                    onChange={e => setFormData(prev => ({ ...prev, electricCapacity: e.target.value }))}
+                    placeholder="예: 50kW, 100A 등"
+                  />
+                </div>
+                <div className="input-field">
+                  <label style={{ fontWeight: 600, marginBottom: 8 }}>기타 특이사항</label>
+                  <input
+                    type="text"
+                    value={formData.spaceEtc || ''}
+                    onChange={e => setFormData(prev => ({ ...prev, spaceEtc: e.target.value }))}
+                    placeholder="특이사항 입력"
+                  />
+                </div>
+              </div>
+              {/* 첨부 파일 */}
+              <div className="site-info-card" style={{ flex: '1 1 220px', minWidth: 220, background: '#fafbfc', borderRadius: 16, boxShadow: '0 2px 8px #0001', padding: 28, marginBottom: 24 }}>
+                <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 18, color: '#1a237e' }}>첨부 파일</h3>
+                <div className="input-field">
+                  <label style={{ fontWeight: 600, marginBottom: 8 }}>인테리어 준공 도서 (기존 사무실 확장 시)</label>
+                  <input
+                    type="file"
+                    onChange={e => setFormData(prev => ({ ...prev, fileInterior: e.target.files[0] }))}
+                  />
+                  {formData.fileInterior && <span style={{ marginLeft: 8 }}>{formData.fileInterior.name}</span>}
+                </div>
+                <div className="input-field">
+                  <label style={{ fontWeight: 600, marginBottom: 8 }}>입주 건물 관련 도서</label>
+                  <input
+                    type="file"
+                    onChange={e => setFormData(prev => ({ ...prev, fileBuilding: e.target.files[0] }))}
+                  />
+                  {formData.fileBuilding && <span style={{ marginLeft: 8 }}>{formData.fileBuilding.name}</span>}
+                </div>
+                <div className="input-field">
+                  <label style={{ fontWeight: 600, marginBottom: 8 }}>빌딩 fit-out guide</label>
+                  <input
+                    type="file"
+                    onChange={e => setFormData(prev => ({ ...prev, fileFitout: e.target.files[0] }))}
+                  />
+                  {formData.fileFitout && <span style={{ marginLeft: 8 }}>{formData.fileFitout.name}</span>}
+                </div>
+                <div className="input-field">
+                  <label style={{ fontWeight: 600, marginBottom: 8 }}>기타 첨부 자료</label>
+                  <input
+                    type="file"
+                    onChange={e => setFormData(prev => ({ ...prev, fileEtc: e.target.files[0] }))}
+                  />
+                  {formData.fileEtc && <span style={{ marginLeft: 8 }}>{formData.fileEtc.name}</span>}
                 </div>
               </div>
             </div>
