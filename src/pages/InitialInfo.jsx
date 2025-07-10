@@ -853,6 +853,7 @@ const InitialInfo = () => {
                     { id: 'microwave', label: '전자레인지' },
                     { id: 'sink', label: '싱크대' },
                     { id: 'fridge', label: '냉장고' },
+                    { id: 'coffee', label: '커피머신' },
                     { id: 'other', label: '기타' }
                   ].map(opt => {
                     const checked = canteenOptions.includes(opt.id);
@@ -1003,16 +1004,38 @@ const InitialInfo = () => {
                           )}
                           {opt.id === 'lounge' && (
                             <>
-                              <div style={{ marginBottom: 4 }}>
-                                <label style={{ fontWeight: 600, marginBottom: 12 }}>좌석 구성: </label>
-                                <select
-                                  value={extraDetail.lounge.seat}
-                                  onChange={e => setExtraDetail(d => ({ ...d, lounge: { ...d.lounge, seat: e.target.value } }))}
-                                >
-                                  <option value="">선택</option>
-                                  <option value="table">테이블 중심</option>
-                                  <option value="casual">소파/쿠션 등 캐주얼</option>
-                                </select>
+                              <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 600, marginBottom: 12 }}>라운지 유형 선택: </label>
+                                <div style={{ display: 'flex', gap: 16 }}>
+                                  {[
+                                    { id: 'work', label: '워크라운지', desc: '테이블 중심 구성' },
+                                    { id: 'rest', label: '휴게라운지', desc: '소파/쿠션 등 캐주얼한 구성' }
+                                  ].map(type => (
+                                    <button
+                                      key={type.id}
+                                      type="button"
+                                      className={extraDetail.lounge.type === type.id ? 'selected' : ''}
+                                      style={{
+                                        padding: '10px 20px',
+                                        borderRadius: 8,
+                                        border: extraDetail.lounge.type === type.id ? '2px solid #007bff' : '1px solid #ccc',
+                                        background: extraDetail.lounge.type === type.id ? '#e6f0ff' : '#fff',
+                                        fontWeight: extraDetail.lounge.type === type.id ? 700 : 400,
+                                        cursor: 'pointer',
+                                        minWidth: 120,
+                                        textAlign: 'left',
+                                        transition: 'all 0.2s',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'flex-start'
+                                      }}
+                                      onClick={() => setExtraDetail(d => ({ ...d, lounge: { ...d.lounge, type: type.id } }))}
+                                    >
+                                      <span style={{ fontSize: 16, fontWeight: 600 }}>{type.label}</span>
+                                      <span style={{ fontSize: 13, color: '#666', marginTop: 2 }}>{type.desc}</span>
+                                    </button>
+                                  ))}
+                                </div>
                               </div>
                               <div>
                                 <label style={{ fontWeight: 600, marginBottom: 12, marginTop: 12 }}>사용 목적: </label>
@@ -1043,7 +1066,7 @@ const InitialInfo = () => {
                           {opt.id === 'breakRoom' && (
                             <div style={{ marginBottom: 4 }}>
                               <label style={{ fontWeight: 600, marginBottom: 12 }}>편의 시설: </label>
-                              {['리클라이너', '안마의자', '요가매트', '침대', '기타'].map(fac => (
+                              {['리클라이너', '안마의자', '요가매트', '침대', '수유 공간', '기타'].map(fac => (
                                 <label key={fac} style={{ marginRight: 12 }}>
                                   <input
                                     type="checkbox"
