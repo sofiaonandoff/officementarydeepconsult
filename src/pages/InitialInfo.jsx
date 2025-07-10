@@ -528,34 +528,6 @@ const InitialInfo = () => {
                     </button>
                   ))}
                 </div>
-                {formData.projectPurpose === 'new' && (
-                  <div style={{ marginTop: 12 }}>
-                    <label style={{ marginRight: 8 }}>신규 유형:</label>
-                    {[
-                      { id: 'built', label: '구축 건물' },
-                      { id: 'newly', label: '신축 건물' }
-                    ].map(opt => (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        className={`building-type-btn${formData.buildingType === opt.id ? ' selected' : ''}`}
-                        style={{
-                          padding: '6px 16px',
-                          borderRadius: 8,
-                          border: formData.buildingType === opt.id ? '2px solid #007bff' : '1px solid #ccc',
-                          background: formData.buildingType === opt.id ? '#e6f0ff' : '#fff',
-                          fontWeight: formData.buildingType === opt.id ? 700 : 400,
-                          cursor: 'pointer',
-                          marginRight: 8,
-                          transition: 'all 0.2s'
-                        }}
-                        onClick={() => handleInputChange({ target: { name: 'buildingType', value: opt.id } })}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
               <div className="input-field" style={{ display: 'flex', alignItems: 'flex-end', gap: 8, marginBottom: 16, width: '100%' }}>
                 <div style={{ flex: 1, width: '100%' }}>
@@ -572,27 +544,29 @@ const InitialInfo = () => {
                 </div>
                 <button type="button" style={{ height: 36, minWidth: 90, marginBottom: 2 }} onClick={handleAddressSearch}>주소 검색</button>
               </div>
-              <div className="input-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div className="input-field">
-                  <label>건물 규모 <span className="required">*</span></label>
+              <div className="input-field">
+                <label>상세 주소</label>
+                <input
+                  type="text"
+                  name="buildingDetailAddress"
+                  value={formData.buildingDetailAddress || ''}
+                  onChange={handleInputChange}
+                  placeholder="상세 주소를 입력하세요 (층, 호수 등)"
+                />
+              </div>
+              <div className="input-field">
+                <label>임차공간 면적 <span className="required">*</span></label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <input
-                    type="text"
+                    type="number"
                     name="buildingSize"
                     value={formData.buildingSize}
                     onChange={handleInputChange}
-                    placeholder="예: 300평 또는 1000m²"
-                  />
-                </div>
-                <div className="input-field">
-                  <label>건물 층수 <span className="required">*</span></label>
-                  <input
-                    type="number"
-                    name="buildingFloors"
-                    value={formData.buildingFloors}
-                    onChange={handleInputChange}
-                    placeholder="건물 층수"
+                    placeholder="임차공간 면적을 입력하세요"
                     min="1"
+                    style={{ flex: 1 }}
                   />
+                  <span style={{ fontWeight: 600, color: '#666' }}>m²</span>
                 </div>
               </div>
               <div className="input-field">
@@ -1573,9 +1547,7 @@ const InitialInfo = () => {
             (step === 1 && (
               !formData.companyName ||
               !formData.projectPurpose ||
-              (formData.projectPurpose === 'new' && !formData.buildingType) ||
               !formData.buildingAddress ||
-              !formData.buildingFloors ||
               !formData.buildingSize
             )) ||
             (step === 2 && ((Array.isArray(formData.seatingType) ? formData.seatingType.length === 0 : true) || formData.workStyle.length === 0)) ||
