@@ -1231,7 +1231,7 @@ const InitialInfo = () => {
             <h2>현장 정보 및 설비 조건</h2>
             <div className="site-info-blocks" style={{ display: 'flex', flexWrap: 'wrap', gap: 32, marginTop: 24 }}>
               {/* 건물 정보 */}
-              <div className="site-info-card" style={{ flex: '1 1 180px', minWidth: 180, background: '#fafbfc', borderRadius: 16, boxShadow: '0 2px 8px #0001', padding: 28, marginBottom: 24 }}>
+              <div className="site-info-card" style={{ flex: '1 1 160px', minWidth: 160, background: '#fafbfc', borderRadius: 16, boxShadow: '0 2px 8px #0001', padding: 28, marginBottom: 24 }}>
                 <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 18, color: '#1a237e' }}>건물 정보</h3>
                 <div className="input-field">
                   <label style={{ fontWeight: 600, marginBottom: 8 }}>건물 내 들어와 있는 통신 회사</label>
@@ -1322,7 +1322,7 @@ const InitialInfo = () => {
                 </div>
               </div>
               {/* 공간 정보 */}
-              <div className="site-info-card" style={{ flex: '1 1 180px', minWidth: 180, background: '#fafbfc', borderRadius: 16, boxShadow: '0 2px 8px #0001', padding: 28, marginBottom: 24 }}>
+              <div className="site-info-card" style={{ flex: '1 1 160px', minWidth: 160, background: '#fafbfc', borderRadius: 16, boxShadow: '0 2px 8px #0001', padding: 28, marginBottom: 24 }}>
                 <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 18, color: '#1a237e' }}>공간 정보</h3>
                 <div className="input-field">
                   <label style={{ fontWeight: 600, marginBottom: 8 }}>냉난방 시스템 실내기 타입/수량/용량</label>
@@ -1343,7 +1343,7 @@ const InitialInfo = () => {
                   />
                 </div>
                 <div className="input-field">
-                  <label style={{ fontWeight: 600, marginBottom: 8 }}>에어컨 실외기 위치 및 여유 공간</label>
+                  <label style={{ fontWeight: 600, marginBottom: 8 }}>에어컨 실외기 위치</label>
                   <input
                     type="text"
                     value={formData.acOutdoorLocation || ''}
@@ -1362,124 +1362,41 @@ const InitialInfo = () => {
                 </div>
               </div>
               {/* 첨부 파일 */}
-              <div className="site-info-card" style={{ flex: '1 1 220px', minWidth: 220, background: '#fafbfc', borderRadius: 16, boxShadow: '0 2px 8px #0001', padding: 28, marginBottom: 24 }}>
+              <div className="site-info-card" style={{ flex: '1 1 200px', minWidth: 200, background: '#fafbfc', borderRadius: 16, boxShadow: '0 2px 8px #0001', padding: 28, marginBottom: 24 }}>
                 <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 18, color: '#1a237e' }}>첨부 파일</h3>
-                <div className="input-field">
-                  <label style={{ fontWeight: 600, marginBottom: 8 }}>인테리어 준공 도서 (기존 사무실 확장 시)</label>
-                  <input
-                    type="file"
-                    multiple
-                    onChange={e => {
-                      const files = Array.from(e.target.files);
-                      setFormData(prev => ({
-                        ...prev,
-                        fileInterior: Array.isArray(prev.fileInterior) ? [...prev.fileInterior, ...files] : files
-                      }));
-                    }}
-                  />
-                  {Array.isArray(formData.fileInterior) && formData.fileInterior.length > 0 && (
-                    <ul style={{ margin: '8px 0 0 0', padding: 0, listStyle: 'none', fontSize: 13 }}>
-                      {formData.fileInterior.map((f, i) => (
-                        <li key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          {f.name}
-                          <button type="button" style={{ marginLeft: 4, color: '#c00', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}
-                            onClick={() => setFormData(prev => ({
-                              ...prev,
-                              fileInterior: prev.fileInterior.filter((_, idx) => idx !== i)
-                            }))}
-                          >×</button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                <div className="input-field">
-                  <label style={{ fontWeight: 600, marginBottom: 8 }}>입주 건물 관련 도서 (이전 및 신규 오피스 설계 시)</label>
-                  <input
-                    type="file"
-                    multiple
-                    onChange={e => {
-                      const files = Array.from(e.target.files);
-                      setFormData(prev => ({
-                        ...prev,
-                        fileBuilding: Array.isArray(prev.fileBuilding) ? [...prev.fileBuilding, ...files] : files
-                      }));
-                    }}
-                  />
-                  {Array.isArray(formData.fileBuilding) && formData.fileBuilding.length > 0 && (
-                    <ul style={{ margin: '8px 0 0 0', padding: 0, listStyle: 'none', fontSize: 13 }}>
-                      {formData.fileBuilding.map((f, i) => (
-                        <li key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          {f.name}
-                          <button type="button" style={{ marginLeft: 4, color: '#c00', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}
-                            onClick={() => setFormData(prev => ({
-                              ...prev,
-                              fileBuilding: prev.fileBuilding.filter((_, idx) => idx !== i)
-                            }))}
-                          >×</button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                <div className="input-field">
-                  <label style={{ fontWeight: 600, marginBottom: 8 }}>빌딩 fit-out guide</label>
-                  <input
-                    type="file"
-                    multiple
-                    onChange={e => {
-                      const files = Array.from(e.target.files);
-                      setFormData(prev => ({
-                        ...prev,
-                        fileFitout: Array.isArray(prev.fileFitout) ? [...prev.fileFitout, ...files] : files
-                      }));
-                    }}
-                  />
-                  {Array.isArray(formData.fileFitout) && formData.fileFitout.length > 0 && (
-                    <ul style={{ margin: '8px 0 0 0', padding: 0, listStyle: 'none', fontSize: 13 }}>
-                      {formData.fileFitout.map((f, i) => (
-                        <li key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          {f.name}
-                          <button type="button" style={{ marginLeft: 4, color: '#c00', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}
-                            onClick={() => setFormData(prev => ({
-                              ...prev,
-                              fileFitout: prev.fileFitout.filter((_, idx) => idx !== i)
-                            }))}
-                          >×</button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                <div className="input-field">
-                  <label style={{ fontWeight: 600, marginBottom: 8 }}>기타 첨부 자료</label>
-                  <input
-                    type="file"
-                    multiple
-                    onChange={e => {
-                      const files = Array.from(e.target.files);
-                      setFormData(prev => ({
-                        ...prev,
-                        fileEtc: Array.isArray(prev.fileEtc) ? [...prev.fileEtc, ...files] : files
-                      }));
-                    }}
-                  />
-                  {Array.isArray(formData.fileEtc) && formData.fileEtc.length > 0 && (
-                    <ul style={{ margin: '8px 0 0 0', padding: 0, listStyle: 'none', fontSize: 13 }}>
-                      {formData.fileEtc.map((f, i) => (
-                        <li key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          {f.name}
-                          <button type="button" style={{ marginLeft: 4, color: '#c00', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}
-                            onClick={() => setFormData(prev => ({
-                              ...prev,
-                              fileEtc: prev.fileEtc.filter((_, idx) => idx !== i)
-                            }))}
-                          >×</button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
+                {[
+                  { key: 'fileInterior', label: '인테리어 준공 도서 (기존 사무실 확장 시)' },
+                  { key: 'fileBuilding', label: '입주 건물 관련 도서 (이전 및 신규 오피스 설계 시)' },
+                  { key: 'fileFitout', label: '빌딩 fit-out guide' },
+                  { key: 'fileEtc', label: '기타 첨부 자료' },
+                  { key: 'sitePhoto', label: '현장 사진' }
+                ].map(item => (
+                  <div className="input-field" key={item.key} style={{ alignItems: 'flex-start', textAlign: 'left' }}>
+                    <label style={{ fontWeight: 600, marginBottom: 8, display: 'block', textAlign: 'left' }}>
+                      <input
+                        type="checkbox"
+                        checked={!!formData[item.key + 'Checked']}
+                        onChange={e => setFormData(prev => ({ ...prev, [item.key + 'Checked']: e.target.checked }))}
+                        style={{ marginRight: 8, verticalAlign: 'middle' }}
+                      />
+                      {item.label}
+                    </label>
+                    {formData[item.key + 'Checked'] && (
+                      <div style={{ textAlign: 'left', width: '100%' }}>
+                        <p style={{ fontSize: 14, color: '#666', marginBottom: 8, textAlign: 'left' }}>
+                          공유 링크를 첨부해주세요. (예: Google Drive, Google Photos 등)
+                        </p>
+                        <input
+                          type="url"
+                          value={formData[item.key + 'Link'] || ''}
+                          onChange={e => setFormData(prev => ({ ...prev, [item.key + 'Link']: e.target.value }))}
+                          placeholder="https://drive.google.com/..."
+                          style={{ width: '90%', padding: '8px 12px', borderRadius: 4, border: '1px solid #ccc', textAlign: 'left' }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -1501,7 +1418,7 @@ const InitialInfo = () => {
             이전
           </button>
         )}
-        {(step === 2 || step === 3) && (
+        {(step === 2 || step === 3 || step === 4) && (
           <button className="skip-button" onClick={handleSkip}>
             SKIP
           </button>
