@@ -746,28 +746,6 @@ const InitialInfo = () => {
               <div className="setting-section">
                 <h3>브랜드 아이덴티티</h3>
                 <div className="brand-identity-fields" style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 8 }}>
-                  {/* 로고 업로드 */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <label style={{ minWidth: 90 }}>브랜드 로고</label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={e => {
-                        const file = e.target.files[0];
-                        setBrandLogo(file);
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onload = ev => setBrandLogoPreview(ev.target.result);
-                          reader.readAsDataURL(file);
-                        } else {
-                          setBrandLogoPreview(null);
-                        }
-                      }}
-                    />
-                    {brandLogoPreview && (
-                      <img src={brandLogoPreview} alt="로고 미리보기" style={{ width: 48, height: 48, objectFit: 'contain', border: '1px solid #eee', borderRadius: 8 }} />
-                    )}
-                  </div>
                   {/* 브랜드 컬러 */}
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
                     <label style={{ minWidth: 90, marginTop: 8 }}>브랜드 컬러</label>
@@ -805,27 +783,11 @@ const InitialInfo = () => {
                       <button type="button" style={{ marginTop: 4, width: 200 }} onClick={() => setBrandColors([...brandColors, '#000000'])}>컬러 추가</button>
                     </div>
                   </div>
-                  {/* 디자인 가이드 업로드 */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <label style={{ minWidth: 90 }}>디자인 가이드</label>
-                    <input
-                      type="file"
-                      accept=".pdf,.ai,.psd,.zip,.ppt,.pptx,.doc,.docx,.hwp,.jpg,.png"
-                      onChange={e => {
-                        const file = e.target.files[0];
-                        setBrandGuide(file);
-                        setBrandGuideName(file ? file.name : '');
-                      }}
-                    />
-                    {brandGuideName && (
-                      <span style={{ fontSize: 13, color: '#555' }}>{brandGuideName}</span>
-                    )}
-                  </div>
                 </div>
               </div>
 
               <div className="setting-section">
-                <h3>업무 공간 분위기</h3>
+                <h3>업무 공간 기능</h3>
                 <div className="seating-options">
                   {[
                     { id: 'focus', label: 'Focus', desc: '집중이 잘 되는 공간' },
@@ -863,35 +825,16 @@ const InitialInfo = () => {
               <div className="setting-section">
                 <h3>선호하는 레퍼런스 이미지</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <p style={{ fontSize: 14, color: '#666', marginBottom: 8 }}>
+                    구글 공유 링크를 첨부해주세요. (예: Google Drive, Google Photos 등)
+                  </p>
                   <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={e => {
-                      const files = Array.from(e.target.files);
-                      // 기존 이미지에 새 파일을 누적
-                      const newImages = [...referenceImages, ...files];
-                      setReferenceImages(newImages);
-                      // 미리보기 누적
-                      Promise.all(files.map(file => {
-                        return new Promise(resolve => {
-                          const reader = new FileReader();
-                          reader.onload = ev => resolve(ev.target.result);
-                          reader.readAsDataURL(file);
-                        });
-                      })).then(newPreviews => {
-                        setReferencePreviews(prev => [...prev, ...newPreviews]);
-                      });
-                    }}
+                    type="url"
+                    value={formData.referenceLink || ''}
+                    onChange={e => setFormData(prev => ({ ...prev, referenceLink: e.target.value }))}
+                    placeholder="https://drive.google.com/..."
+                    style={{ width: '100%', padding: '8px 12px', borderRadius: 4, border: '1px solid #ccc' }}
                   />
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
-                    {referencePreviews.map((src, idx) => (
-                      <div key={idx} style={{ textAlign: 'center' }}>
-                        <img src={src} alt={`ref${idx}`} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8, border: '1px solid #eee' }} />
-                        <div style={{ fontSize: 12, color: '#555', marginTop: 2, maxWidth: 80, wordBreak: 'break-all' }}>{referenceImages[idx]?.name}</div>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               </div>
             </div>
