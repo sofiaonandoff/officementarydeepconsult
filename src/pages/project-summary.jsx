@@ -70,7 +70,7 @@ const ProjectSummary = () => {
                   'security': '보안', 'network': '통신', 'av': 'AV', 'move': '이사', 'furniture': '가구', 'landscape': '조경', 'none': '없음', 'etc': '기타'
                 }[id] || id;
                 return opt;
-              }).join(', ')} {formData?.directOrder?.includes('etc') && formData?.directOrderEtc ? `(${formData.directOrderEtc})` : ''}</p>
+              }).filter(id => id !== '기타').join(', ')} {formData?.directOrder?.includes('etc') && formData?.directOrderEtc ? `${formData.directOrder.filter(id => id !== 'etc').length > 0 ? ', ' : ''}기타(${formData.directOrderEtc})` : ''}</p>
             </div>
             {/* 3. 디자인 방향성 */}
             <div className="info-item">
