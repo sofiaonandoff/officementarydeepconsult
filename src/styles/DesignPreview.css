@@ -45,12 +45,14 @@
   color: #4a90e2;
   margin-bottom: 1rem;
   font-size: 1.2rem;
+  text-align: center;
 }
 
 .info-item p {
   color: #666;
   margin: 0.5rem 0;
   line-height: 1.5;
+  text-align: left;
 }
 
 .loading-animation {

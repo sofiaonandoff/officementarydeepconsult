@@ -437,9 +437,16 @@ const InitialInfo = () => {
       // 4단계에서만 요약 페이지로 이동
       const mergedFormData = {
         ...formData,
-        workStyleOther
+        workStyleOther,
+        brandColors,
+        canteenOptions,
+        canteenOther,
+        meetingOptions,
+        meetingOther,
+        extraSpaces,
+        extraDetail,
       };
-      navigate('/design-preview', { state: { formData: mergedFormData } });
+      navigate('/project-summary', { state: { formData: mergedFormData } });
     }
   };
 
@@ -451,9 +458,16 @@ const InitialInfo = () => {
     } else if (step === 4) {
       const mergedFormData = {
         ...formData,
-        workStyleOther
+        workStyleOther,
+        brandColors,
+        canteenOptions,
+        canteenOther,
+        meetingOptions,
+        meetingOther,
+        extraSpaces,
+        extraDetail,
       };
-      navigate('/design-preview', { state: { formData: mergedFormData } });
+      navigate('/project-summary', { state: { formData: mergedFormData } });
     }
   };
 
@@ -773,11 +787,9 @@ const InitialInfo = () => {
                             style={{ width: 90, marginLeft: 8 }}
                             maxLength={7}
                           />
-                          {brandColors.length > 1 && (
-                            <button type="button" style={{ marginLeft: 4 }} onClick={() => {
-                              setBrandColors(brandColors.filter((_, i) => i !== idx));
-                            }}>삭제</button>
-                          )}
+                          <button type="button" style={{ marginLeft: 4 }} onClick={() => {
+                            setBrandColors(brandColors.filter((_, i) => i !== idx));
+                          }}>삭제</button>
                         </div>
                       ))}
                       <button type="button" style={{ marginTop: 4, width: 200 }} onClick={() => setBrandColors([...brandColors, '#000000'])}>컬러 추가</button>
@@ -1433,10 +1445,8 @@ const InitialInfo = () => {
               !formData.buildingAddress ||
               !formData.buildingSize
             )) ||
-            (step === 2 && ((Array.isArray(formData.seatingType) ? formData.seatingType.length === 0 : true) || formData.workStyle.length === 0)) ||
-            (step === 4 && (!formData.companyName || !formData.contactName ||
-              !formData.contactPhone || !formData.contactEmail ||
-              emailError || !validateEmail(formData.contactEmail)))
+            (step === 2 && ((Array.isArray(formData.seatingType) ? formData.seatingType.length === 0 : true) || formData.workStyle.length === 0))
+            // step === 4는 항상 활성화
           }
         >
           {step === 4 ? '다음' : '다음'}

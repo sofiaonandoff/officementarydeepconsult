@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import InitialInfo from './pages/InitialInfo';
-import DesignPreview from './pages/DesignPreview';
+import ProjectSummary from './pages/project-summary';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
@@ -34,7 +34,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/initial-info" replace />} />
             <Route path="/initial-info" element={<InitialInfo />} />
-            <Route path="/design-preview" element={<DesignPreview />} />
+            <Route path="/project-summary" element={<ProjectSummary />} />
           </Routes>
         </main>
       </div>
