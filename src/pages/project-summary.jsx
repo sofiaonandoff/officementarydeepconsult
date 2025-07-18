@@ -105,7 +105,10 @@ const ProjectSummary = () => {
     lines.push(`업무 공간 기능,${Array.isArray(formData.seatingType) ? formData.seatingType.join(', ') : ''}`);
     lines.push(`레퍼런스 링크,${formData.referenceLink || ''}`);
     // 세부 공간
-    lines.push(`세부 공간 구성,${formatSpaceDetails()}`);
+    // 캔틴/미팅룸 정보 추가
+    lines.push(`캔틴 구성,${getCanteenOptionsString()}`);
+    lines.push(`회의실 구성,${getMeetingOptionsString()}`);
+    lines.push(`${formatSpaceDetails()}`);
     // 현장 정보
     lines.push(`건물 내 통신사,${(formData.buildingTelecom || []).join(', ')}`);
     lines.push(`필요 보험,${(formData.buildingInsurance || []).join(', ')}${formData.buildingInsurance?.includes('기타') && formData.buildingInsuranceEtc ? `(${formData.buildingInsuranceEtc})` : ''}`);
@@ -129,6 +132,26 @@ const ProjectSummary = () => {
     ).filter(Boolean);
     lines.push(`첨부파일,${attachArr.join(' | ')}`);
     return lines.join('\n');
+  };
+
+  // 캔틴/미팅룸 옵션 보기 좋게 변환
+  const getCanteenOptionsString = () => {
+    if (!formData?.canteenOptions?.length) return '없음';
+    return formData.canteenOptions.map(id => {
+      const opt = {
+        'water': '정수기', 'microwave': '전자레인지', 'sink': '싱크대', 'fridge': '냉장고', 'coffee': '커피머신', 'other': '기타'
+      }[id] || id;
+      return opt;
+    }).join(', ') + (formData.canteenOptions.includes('other') && formData.canteenOther ? ` (기타: ${formData.canteenOther})` : '');
+  };
+  const getMeetingOptionsString = () => {
+    if (!formData?.meetingOptions?.length) return '없음';
+    return formData.meetingOptions.map(id => {
+      const opt = {
+        'video': '화상 회의 장비', 'tv': 'TV', 'whiteboard': '화이트보드', 'projector': '프로젝터', 'other': '기타'
+      }[id] || id;
+      return opt;
+    }).join(', ') + (formData.meetingOptions.includes('other') && formData.meetingOther ? ` (기타: ${formData.meetingOther})` : '');
   };
 
   const handleSubmitData = async () => {
@@ -176,7 +199,9 @@ const ProjectSummary = () => {
             : null
         ).filter(Boolean)
       ].join('\n'),
-      attachment_section: getAttachmentSection()
+      attachment_section: getAttachmentSection(),
+      canteenOptions: getCanteenOptionsString(),
+      meetingOptions: getMeetingOptionsString()
     };
 
     try {
