@@ -2,6 +2,16 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/InitialInfo.css';
 
+// 상단에 이미지 import 추가
+import naturalImg from '../assets/designkeywords/Officementary_Look&Feel_Images_01 Natural & Calm.jpg';
+import minimalImg from '../assets/designkeywords/Officementary_Look&Feel_Images_02 Minimal & Monotone.jpg';
+import industrialImg from '../assets/designkeywords/Officementary_Look&Feel_Images_03 Industrial & Urban.jpg';
+import futuristicImg from '../assets/designkeywords/Officementary_Look&Feel_Images_04 Futuristic & Techy.jpg';
+import warmImg from '../assets/designkeywords/Officementary_Look&Feel_Images_05 Warm & Cozy.jpg';
+import playfulImg from '../assets/designkeywords/Officementary_Look&Feel_Images_06 Playful & Creative.jpg';
+import elegantImg from '../assets/designkeywords/Officementary_Look&Feel_Images_07 Elegant.jpg';
+import colorPointedImg from '../assets/designkeywords/Officementary_Look&Feel_Images_08 Color-Pointed.jpg';
+
 // 카카오 주소 API 스크립트 로드 함수
 function loadDaumPostcodeScript(callback) {
   if (document.getElementById('daum-postcode-script')) {
@@ -419,16 +429,16 @@ const InitialInfo = () => {
             <div className="space-settings">
               <div className="setting-section">
                 <h3>디자인 키워드</h3>
-                <div className="work-style-options">
+                <div className="work-style-options" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
                   {[
-                    { id: 'minimal', label: 'Minimal & Sleek', icon: '🧊', desc: '미니멀하고 매끄러운' },
-                    { id: 'natural', label: 'Natural & Calm', icon: '🌿', desc: '자연스럽고 차분한' },
-                    { id: 'industrial', label: 'Industrial & Urban', icon: '🏙️', desc: '노출 구조, 도심 감성' },
-                    { id: 'warm', label: 'Warm & Cozy', icon: '🌞', desc: '따뜻하고 아늑한' },
-                    { id: 'futuristic', label: 'Futuristic & Techy', icon: '🌀', desc: '미래지향적이고 기술적인' },
-                    { id: 'playful', label: 'Playful & Creative', icon: '🌈', desc: '유쾌하고 창의적인' },
-                    { id: 'classic', label: 'Classic & Elegant', icon: '📚', desc: '고전적이고 정제된' },
-                    { id: 'layered', label: 'Layered & Textured', icon: '✨', desc: '복합적이고 입체감 있는' },
+                    { id: 'natural', label: 'Natural & Calm', icon: '🌿', desc: '자연스럽고 차분한', img: naturalImg },
+                    { id: 'minimal', label: 'Minimal & Monotone', icon: '📐', desc: '절제되고 정돈된', img: minimalImg },
+                    { id: 'industrial', label: 'Industrial & Urban', icon: '🏙️', desc: '인더스트리얼 감성과 도시적인', img: industrialImg },
+                    { id: 'futuristic', label: 'Futuristic & Techy', icon: '🌀', desc: '미래지향적이고 기술적인', img: futuristicImg },
+                    { id: 'warm', label: 'Warm & Cozy', icon: '🌞', desc: '따뜻하고 아늑한', img: warmImg },
+                    { id: 'playful', label: 'Playful & Creative', icon: '🌈', desc: '유쾌하고 창의적인', img: playfulImg },
+                    { id: 'elegant', label: 'Elegant', icon: '💎', desc: '고급스럽고 세련된', img: elegantImg },
+                    { id: 'colorPointed', label: 'Color-Pointed', icon: '🎨', desc: '포인트 색감이 돋보이는', img: colorPointedImg },
                     { id: 'other', label: '기타', icon: '➕', desc: '' }
                   ].map((style) => {
                     const checked = formData.workStyle.includes(style.id);
@@ -446,6 +456,15 @@ const InitialInfo = () => {
                         />
                         <span className="icon" style={{ marginRight: 6 }}>{style.icon}</span>
                         {style.label}
+                        {/* 이미지 표시 */}
+                        {style.img && (
+                          <img
+                            src={style.img}
+                            alt={style.label}
+                            style={{ width: 240, borderRadius: 12, margin: '12px 0', cursor: 'pointer', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
+                            onClick={() => setEnlargedImg(style.img)}
+                          />
+                        )}
                         {style.desc && <span style={{ display: 'block', fontSize: 12, color: '#888', marginTop: 2 }}>{style.desc}</span>}
                         {style.id === 'other' && checked && (
                           <input

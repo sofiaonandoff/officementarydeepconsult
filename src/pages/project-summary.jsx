@@ -11,14 +11,14 @@ const ProjectSummary = () => {
 
   // 유틸: 라벨 변환
   const getWorkStyleLabel = (id) => ({
-    'minimal': 'Minimal & Sleek',
     'natural': 'Natural & Calm',
+    'minimal': 'Minimal & Monotone',
     'industrial': 'Industrial & Urban',
-    'warm': 'Warm & Cozy',
     'futuristic': 'Futuristic & Techy',
+    'warm': 'Warm & Cozy',
     'playful': 'Playful & Creative',
-    'classic': 'Classic & Elegant',
-    'layered': 'Layered & Textured',
+    'elegant': 'Elegant',
+    'colorPointed': 'Color-Pointed',
     'other': formData?.workStyleOther || '기타'
   }[id] || id);
 
