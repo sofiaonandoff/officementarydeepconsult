@@ -102,6 +102,7 @@ const ProjectSummary = () => {
     };
     const lines = [];
     lines.push(`회사명,${escapeCSV(formData.companyName || '')}`);
+    lines.push(`이메일,${escapeCSV(formData.companyEmail || '')}`);
     lines.push(`프로젝트 목적,${escapeCSV(formData.projectPurpose === 'move' ? '이전' : formData.projectPurpose === 'expand' ? '확장' : '신규')}`);
     lines.push(`건물 주소,${escapeCSV(formData.buildingAddress || '')}`);
     lines.push(`상세 주소,${escapeCSV(formData.buildingDetailAddress || '')}`);
@@ -172,6 +173,7 @@ const ProjectSummary = () => {
     setSending(true);
     const emailData = {
       company_name: formData.companyName,
+      company_email: formData.companyEmail,
       buildingAddress: formData.buildingAddress,
       buildingDetailAddress: formData.buildingDetailAddress || '',
       buildingSize: formData.buildingSize,
@@ -221,9 +223,16 @@ const ProjectSummary = () => {
     try {
       await emailjs.send(
         'service_officementary2',
-        'template_2ls7vl8',
+        'template_officementary2',
         emailData,
-        'YiZScPmNjcBDnC8nm'
+        'SUEAclspdW_UYCask'
+      );
+      // 두 번째 템플릿 전송
+      await emailjs.send(
+        'service_officementary2',
+        'template_officeclient2', // ← 두 번째 템플릿 ID
+        emailData,        // ← 두 번째 템플릿에 맞는 데이터
+        'SUEAclspdW_UYCask'
       );
       alert('상담 정보가 성공적으로 제출되었습니다.');
     } catch (e) {
@@ -244,6 +253,7 @@ const ProjectSummary = () => {
             <div className="info-item">
               <h3>프로젝트 기본 정보</h3>
               <p className="info-value">회사명: {formData?.companyName}</p>
+              <p className="info-value">이메일: {formData?.companyEmail}</p>
               <p className="info-value">프로젝트 목적: {formData?.projectPurpose === 'move' ? '이전' : formData?.projectPurpose === 'expand' ? '확장' : '신규'}</p>
               <p className="info-value">건물 주소: {formData?.buildingAddress}</p>
               <p className="info-value">상세 주소: {formData?.buildingDetailAddress}</p>

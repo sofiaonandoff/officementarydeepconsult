@@ -1,10 +1,11 @@
 import emailjs from '@emailjs/browser';
 
 // 이메일 전송 서비스
-const EMAIL_SERVICE_ID = 'service_officemmphase2';
+const EMAIL_SERVICE_ID = 'service_officementary2';
 const EMAIL_TEMPLATE_ID = 'template_i0oey2n';
 const EMAIL_USER_ID = 'YiZScPmNjcBDnC8nm';
 
+/*
 const generateCSV = (data) => {
   const rows = [
     ['구분', '항목', '내용'],
@@ -98,7 +99,7 @@ export const sendOfficeDataEmail = async (formData) => {
     throw new Error(error.message || '이메일 전송 중 오류가 발생했습니다.');
   }
 };
-
+*/
 const formatEmailContent = (data) => {
   const workStyleMap = {
     'startup': '스타트업',

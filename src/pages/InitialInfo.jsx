@@ -52,6 +52,7 @@ const InitialInfo = () => {
   // 초기 formData 상태
   const initialFormData = {
     companyName: '',
+    companyEmail: '',
     projectPurpose: '', // 이전 / 확장 / 신규(구축/신축)
     buildingAddress: '',
     buildingSize: '', // 평수 or m²
@@ -235,6 +236,16 @@ const InitialInfo = () => {
                   value={formData.companyName}
                   onChange={handleInputChange}
                   placeholder="회사명을 입력하세요"
+                />
+              </div>
+              <div className="input-field">
+                <label>이메일 <span className="required">*</span></label>
+                <input
+                  type="email"
+                  name="companyEmail"
+                  value={formData.companyEmail}
+                  onChange={handleInputChange}
+                  placeholder="이메일을 입력하세요"
                 />
               </div>
               <div className="input-field">
