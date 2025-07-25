@@ -32,7 +32,7 @@ const InitialInfo = () => {
   const [emailError, setEmailError] = useState('');
   const [workStyleOther, setWorkStyleOther] = useState('');
   const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
-  const [brandColors, setBrandColors] = useState(['#000000']);
+  const [brandColors, setBrandColors] = useState([]);
   const [canteenOptions, setCanteenOptions] = useState([]);
   const [canteenOther, setCanteenOther] = useState('');
   const [meetingOptions, setMeetingOptions] = useState([]);
@@ -488,6 +488,9 @@ const InitialInfo = () => {
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
                     <label style={{ minWidth: 90, marginTop: 8 }}>브랜드 컬러</label>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {brandColors.length === 0 && (
+                        <div style={{ color: '#aaa', fontSize: 14, marginBottom: 4 }}>브랜드 컬러를 추가하려면 아래 버튼을 눌러주세요.</div>
+                      )}
                       {brandColors.map((color, idx) => (
                         <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <input
