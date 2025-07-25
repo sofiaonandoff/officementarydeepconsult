@@ -457,6 +457,7 @@ const InitialInfo = () => {
                         <span className="icon" style={{ marginRight: 6 }}>{style.icon}</span>
                         {style.label}
                         {/* 이미지 표시 */}
+                        {style.desc && <span style={{ display: 'block', fontSize: 12, color: '#888', marginTop: 2 }}>{style.desc}</span>}
                         {style.img && (
                           <img
                             src={style.img}
@@ -465,7 +466,6 @@ const InitialInfo = () => {
                             onClick={() => setEnlargedImg(style.img)}
                           />
                         )}
-                        {style.desc && <span style={{ display: 'block', fontSize: 12, color: '#888', marginTop: 2 }}>{style.desc}</span>}
                         {style.id === 'other' && checked && (
                           <input
                             type="text"
