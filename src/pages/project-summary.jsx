@@ -87,37 +87,51 @@ const ProjectSummary = () => {
 
   // CSV 형식 상담 요약 생성
   const getAttachmentSection = () => {
+    // CSV 필드 escape 함수
+    const escapeCSV = (value) => {
+      if (value == null) return '';
+      const str = String(value);
+      if (str.includes('"')) {
+        // 내부 쌍따옴표는 두 번 반복
+        return '"' + str.replace(/"/g, '""') + '"';
+      }
+      if (str.includes(',') || str.includes('\n')) {
+        return '"' + str.replace(/"/g, '""') + '"';
+      }
+      return str;
+    };
     const lines = [];
-    lines.push(`회사명,${formData.companyName || ''}`);
-    lines.push(`프로젝트 목적,${formData.projectPurpose === 'move' ? '이전' : formData.projectPurpose === 'expand' ? '확장' : '신규'}`);
-    lines.push(`건물 주소,${formData.buildingAddress || ''}`);
-    lines.push(`상세 주소,${formData.buildingDetailAddress || ''}`);
-    lines.push(`임차공간 면적,${formData.buildingSize || ''}`);
-    lines.push(`직접 발주 사항,${(formData.directOrder || []).map(id => ({
+    lines.push(`회사명,${escapeCSV(formData.companyName || '')}`);
+    lines.push(`프로젝트 목적,${escapeCSV(formData.projectPurpose === 'move' ? '이전' : formData.projectPurpose === 'expand' ? '확장' : '신규')}`);
+    lines.push(`건물 주소,${escapeCSV(formData.buildingAddress || '')}`);
+    lines.push(`상세 주소,${escapeCSV(formData.buildingDetailAddress || '')}`);
+    lines.push(`임차공간 면적,${escapeCSV(formData.buildingSize || '')}`);
+    lines.push(`직접 발주 사항,${escapeCSV((formData.directOrder || []).map(id => ({
       'security': '보안', 'network': '통신', 'av': 'AV', 'move': '이사', 'furniture': '가구', 'landscape': '조경', 'none': '없음', 'etc': '기타'
-    }[id] || id)).filter(opt => opt !== '기타').join(', ') + (formData.directOrder?.includes('etc') && formData.directOrderEtc ? (formData.directOrder.length > 1 ? ', ' : '') + `기타(${formData.directOrderEtc})` : '')}`);
-    lines.push(`공사 희망 일정,${formData.constructionStart || '미정'} ~ ${formData.constructionEnd || '미정'}`);
-    lines.push(`공사 가능 시간,${(formData.constructionTimes || []).map(id => ({
+    }[id] || id)).filter(opt => opt !== '기타').join(', ') + (formData.directOrder?.includes('etc') && formData.directOrderEtc ? (formData.directOrder.length > 1 ? ', ' : '') + `기타(${formData.directOrderEtc})` : ''))}`);
+    lines.push(`공사 희망 일정,${escapeCSV(formData.constructionStart || '미정')} ~ ${escapeCSV(formData.constructionEnd || '미정')}`);
+    lines.push(`공사 가능 시간,${escapeCSV((formData.constructionTimes || []).map(id => ({
       'weekday-day': '평일 주간', 'weekday-night': '평일 야간', 'weekend-day': '주말 주간', 'weekend-night': '주말 야간'
-    }[id] || id)).join(', ')}`);
-    lines.push(`디자인 키워드,${(formData.workStyle || []).join(', ')}`);
-    lines.push(`브랜드 컬러,${(formData.brandColors || []).join(', ')}`);
-    lines.push(`업무 공간 기능,${Array.isArray(formData.seatingType) ? formData.seatingType.join(', ') : ''}`);
-    lines.push(`레퍼런스 링크,${formData.referenceLink || ''}`);
+    }[id] || id)).join(', '))}`);
+    lines.push(`디자인 키워드,${escapeCSV((formData.workStyle || []).join(', '))}`);
+    lines.push(`브랜드 컬러,${escapeCSV((formData.brandColors || []).join(', '))}`);
+    lines.push(`업무 공간 기능,${escapeCSV(Array.isArray(formData.seatingType) ? formData.seatingType.join(', ') : '')}`);
+    lines.push(`레퍼런스 링크,${escapeCSV(formData.referenceLink || '')}`);
     // 세부 공간
     // 캔틴/미팅룸 정보 추가
-    lines.push(`캔틴 구성,${getCanteenOptionsString()}`);
-    lines.push(`회의실 구성,${getMeetingOptionsString()}`);
-    lines.push(`${formatSpaceDetails()}`);
+    lines.push(`캔틴 구성,${escapeCSV(getCanteenOptionsString())}`);
+    lines.push(`회의실 구성,${escapeCSV(getMeetingOptionsString())}`);
+    // formatSpaceDetails는 여러 줄이므로 한 줄로 변환
+    lines.push(`추가 공간,${escapeCSV(formatSpaceDetails().replace(/\n/g, ' | '))}`);
     // 현장 정보
-    lines.push(`건물 내 통신사,${(formData.buildingTelecom || []).join(', ')}`);
-    lines.push(`필요 보험,${(formData.buildingInsurance || []).join(', ')}${formData.buildingInsurance?.includes('기타') && formData.buildingInsuranceEtc ? `(${formData.buildingInsuranceEtc})` : ''}`);
-    lines.push(`시설 관리팀 연락처,${formData.facilityContactProvided ? `${formData.facilityContactName || ''} ${formData.facilityContactPhone || ''}` : '제공 불가'}`);
-    lines.push(`기타 특이사항,${formData.spaceEtc || ''}`);
-    lines.push(`냉난방 실내기,${formData.acIndoorSystem || ''}`);
-    lines.push(`냉난방 실외기,${formData.acOutdoorSystem || ''}`);
-    lines.push(`실외기 위치,${formData.acOutdoorLocation || ''}`);
-    lines.push(`전기 용량,${formData.electricCapacity || ''}`);
+    lines.push(`건물 내 통신사,${escapeCSV((formData.buildingTelecom || []).join(', '))}`);
+    lines.push(`필요 보험,${escapeCSV((formData.buildingInsurance || []).join(', ') + (formData.buildingInsurance?.includes('기타') && formData.buildingInsuranceEtc ? `(${formData.buildingInsuranceEtc})` : ''))}`);
+    lines.push(`시설 관리팀 연락처,${escapeCSV(formData.facilityContactProvided ? `${formData.facilityContactName || ''} ${formData.facilityContactPhone || ''}` : '제공 불가')}`);
+    lines.push(`기타 특이사항,${escapeCSV(formData.spaceEtc || '')}`);
+    lines.push(`냉난방 실내기,${escapeCSV(formData.acIndoorSystem || '')}`);
+    lines.push(`냉난방 실외기,${escapeCSV(formData.acOutdoorSystem || '')}`);
+    lines.push(`실외기 위치,${escapeCSV(formData.acOutdoorLocation || '')}`);
+    lines.push(`전기 용량,${escapeCSV(formData.electricCapacity || '')}`);
     // 첨부파일
     const attachArr = ['fileInterior', 'fileBuilding', 'fileFitout', 'fileEtc', 'sitePhoto'].map(key =>
       formData[key + 'Checked'] && formData[key + 'Link']
@@ -130,7 +144,7 @@ const ProjectSummary = () => {
         }[key]}: ${formData[key + 'Link']}`
         : null
     ).filter(Boolean);
-    lines.push(`첨부파일,${attachArr.join(' | ')}`);
+    lines.push(`첨부파일,${escapeCSV(attachArr.join(' | '))}`);
     return lines.join('\n');
   };
 
